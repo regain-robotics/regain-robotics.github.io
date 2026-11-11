@@ -3,23 +3,544 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="REGAIN benchmarks failure detection and recovery for robot foundation models.">
-<title>REGAIN: Benchmarking Failure Detection and Recovery for Robot Foundation Models</title>
+<meta name="description" content="REGAIN evaluates streaming failure detection, stage recovery, and online task rescue for robot foundation models.">
 <meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#101114">
+<title>REGAIN: Benchmarking Failure Handling in Robot Foundation Models</title>
 <style>
 @font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:200 800;font-display:swap;src:url("static/fonts/plus-jakarta-sans.ttf") format("truetype")}
-:root{color-scheme:dark;--bg:#101114;--text:#f5f6f7;--muted:#c4c7cc;--accent:#4d6bff;--accent-hover:#4059df}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}body{font-family:"Plus Jakarta Sans","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}.hero{position:relative;isolation:isolate;min-height:calc(100svh - 48px);margin:24px;border-radius:20px;display:flex;align-items:center;overflow:hidden;background:#282c30}.demo-placeholder{position:absolute;inset:0;z-index:-3;background:#343b40;display:flex;align-items:center;padding-left:15%}.demo-marker{display:flex;align-items:center;flex-direction:column;gap:18px;color:#a9b1b7;font-size:10px;font-weight:500;letter-spacing:.13em}.demo-marker svg{width:48px;height:48px;fill:none;stroke:currentColor;stroke-width:1}.hero:before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(17,19,23,.04),rgba(17,19,23,.24) 34%,rgba(17,19,23,.76) 64%,rgba(17,19,23,.88))}.hero-copy{width:58%;max-width:1050px;margin-left:42%;padding:80px clamp(36px,4.5vw,84px) 80px 0}h1{margin:0;font-size:clamp(76px,8.4vw,140px);font-weight:450;line-height:1;letter-spacing:-.055em}.paper-title{margin:28px 0 0;font-size:clamp(25px,2.2vw,38px);font-weight:400;line-height:1.23;letter-spacing:-.025em}.paper-title span{display:block}.links{display:flex;gap:12px;margin:38px 0 32px}.links a{display:inline-flex;gap:26px;align-items:center;justify-content:space-between;min-width:130px;padding:15px 22px;border:1px solid #ffffff65;border-radius:999px;color:var(--text);text-decoration:none;font-size:14px;font-weight:500;line-height:1.2;background:transparent;transition:background .18s,border-color .18s}.links a:first-child{background:var(--accent);border-color:var(--accent);color:#fff}.links a:hover{background:#4d6bff18;border-color:var(--accent)}.links a:first-child:hover{background:var(--accent-hover);border-color:var(--accent-hover)}.links a:focus-visible{outline:2px solid var(--accent);outline-offset:5px}.summary{max-width:560px}.summary h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.summary p{font-size:17px;line-height:1.65;font-weight:400;margin:0;color:var(--muted)}@media(min-width:1600px){.hero-copy{width:55%;margin-left:45%}}@media(max-width:1000px){.hero-copy{width:63%;margin-left:37%;padding:64px 32px 64px 0}.demo-placeholder{padding-left:11%}h1{font-size:88px}.paper-title{font-size:30px}.summary p{font-size:16px}}@media(max-width:600px){.hero{min-height:calc(100svh - 24px);margin:12px;border-radius:14px;align-items:flex-end}.demo-placeholder{align-items:flex-start;justify-content:center;padding:48px 0 0}.demo-marker{font-size:8px;gap:12px}.demo-marker svg{width:34px;height:34px}.hero:before{background:linear-gradient(180deg,rgba(17,19,23,.03),rgba(17,19,23,.46) 25%,rgba(17,19,23,.88) 52%,rgba(17,19,23,.96))}.hero-copy{width:100%;margin:0;padding:210px 24px 36px}h1{font-size:clamp(62px,18vw,100px);font-weight:450}.paper-title{font-size:clamp(24px,6.4vw,32px);margin-top:24px;line-height:1.24}.links{margin:30px 0 26px;gap:10px}.links a{min-width:120px;padding:14px 18px;font-size:14px}.summary p{font-size:15px;line-height:1.65}}@media(prefers-reduced-motion:reduce){.links a{transition:none}}
+:root{color-scheme:dark;--bg:#101114;--surface:#191b20;--text:#f5f6f7;--muted:#b5b9c5;--accent:#4d6bff;--line:#ffffff24;--gutter:clamp(24px,6vw,96px)}
+*{box-sizing:border-box}html{scroll-padding-top:32px}body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit}a:focus-visible,button:focus-visible,[tabindex="0"]:focus-visible{outline:2px solid #92a4ff;outline-offset:5px}.wrap{width:min(calc(100% - 2*var(--gutter)),1200px);margin-inline:auto}h1,h2,h3,p,figure{margin:0}h2{font-size:clamp(30px,3.5vw,48px);font-weight:450;letter-spacing:-.045em;line-height:1.15}h3{font-weight:500;letter-spacing:-.025em}.muted{color:var(--muted)}.skip{position:absolute;left:24px;top:-80px;z-index:10;background:var(--accent);padding:16px}.skip:focus{top:16px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:88px}.wordmark{font-size:18px;font-weight:600;letter-spacing:-.04em}.topbar nav{display:flex;gap:28px;font-size:13px;color:var(--muted)}.topbar nav a:hover,.footer a:hover{color:white}.hero{padding:76px 0 72px}.hero h1{font-size:clamp(88px,12.3vw,176px);line-height:.94;letter-spacing:-.065em;font-weight:450}.hero-title{font-size:clamp(28px,3.45vw,48px);font-weight:400;letter-spacing:-.035em;line-height:1.2;margin-top:32px}.hero-title span{display:block}.hero-bottom{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end;margin-top:48px}.links{display:flex;gap:12px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;justify-content:space-between;gap:40px;border:1px solid #ffffff60;border-radius:999px;padding:16px 24px;font-size:14px;line-height:1.2;min-width:140px;transition:background .18s,border-color .18s}.button.primary{background:var(--accent);border-color:var(--accent)}.button:hover{background:#ffffff12;border-color:#ffffffa0}.button.primary:hover{background:#4059df;border-color:#4059df}.brief{font-size:16px;line-height:1.75;color:var(--muted);max-width:550px}.hero-copy{animation:enter .6s ease-out both}@keyframes enter{from{transform:translateY(12px)}to{transform:translateY(0)}}.teaser{padding-bottom:64px}.video-slot{aspect-ratio:16/9;border-radius:20px;background:#1e2129;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;position:relative}.video-slot:before,.video-slot:after{content:"";position:absolute;left:24px;width:24px;height:24px;border-color:#ffffff35;border-style:solid}.video-slot:before{top:24px;border-width:1px 0 0 1px}.video-slot:after{bottom:24px;border-width:0 0 1px 1px}.play-mark{display:grid;place-items:center;width:72px;height:72px;border:1px solid #ffffff35;border-radius:50%;color:#d0d4e0}.play-mark svg{width:24px;height:24px;margin-left:4px;fill:currentColor}.video-slot h2{font-size:16px;font-weight:500;letter-spacing:0}.video-slot p{font-size:13px;color:var(--muted);margin-top:8px;text-align:center}.section{padding:112px 0}.section-heading{display:flex;justify-content:space-between;align-items:baseline;gap:32px;margin-bottom:48px}.section-heading>p{max-width:440px;color:var(--muted);font-size:16px;line-height:1.7}.section-index{color:#a9b5ff;font-size:13px;letter-spacing:0;margin-bottom:20px}.concern{display:grid;grid-template-columns:1fr 2fr;gap:48px;padding:16px 0 64px}.small-heading{font-size:14px;font-weight:500;color:#a9b5ff}.concern p{font-size:clamp(24px,2.8vw,38px);line-height:1.4;letter-spacing:-.035em;max-width:800px}.tracks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px}.track{padding-top:24px;border-top:1px solid var(--line)}.track .number{font-size:13px;color:#a9b5ff}.track h3{font-size:24px;line-height:1.3;margin:20px 0 16px;max-width:270px}.track p{font-size:16px;line-height:1.75;color:var(--muted)}.track .question{font-size:15px;color:var(--text);margin-top:24px}.data{background:#16181d}.data-intro{display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-bottom:48px}.data-intro h3{font-size:28px}.data-intro p{color:var(--muted);font-size:16px;line-height:1.75}.paired{position:relative;background:var(--bg);border-radius:20px;padding:48px;display:grid;grid-template-columns:1fr 1fr;gap:32px 128px;align-items:center}.paired-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.paired-lines path{fill:none;stroke:#727887;stroke-width:2;vector-effect:non-scaling-stroke}.paired-lines path:last-child{stroke:var(--accent)}.prefix{grid-row:1/3;z-index:1}.branch{z-index:1;background:var(--bg);padding:16px 0}.paired-label{font-size:13px;color:var(--muted);margin-bottom:12px}.paired h3{font-size:22px;line-height:1.4}.prefix p:last-child,.branch p:last-child{font-size:14px;line-height:1.7;color:var(--muted);margin-top:12px;max-width:300px}.branch.corrective h3{color:#a9b5ff}.data-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:40px}.data-notes h3{font-size:16px;margin-bottom:12px}.data-notes p{font-size:14px;line-height:1.8;color:var(--muted)}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px}.tabs button{border:1px solid transparent;border-radius:999px;background:none;color:var(--muted);padding:13px 20px;cursor:pointer;font-size:14px;min-height:46px}.tabs button[aria-selected="true"]{background:var(--accent);color:white}.tabs button:hover{border-color:#ffffff45}.board-intro{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:24px}.board-intro h3{font-size:22px}.status{font-size:13px;color:var(--muted)}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px;text-align:right}caption{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}th,td{padding:20px 16px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:13px;color:var(--muted);font-weight:400;background:#191b20}th:first-child,td:first-child{text-align:left;padding-left:24px}td.empty{text-align:center;padding:64px 24px;white-space:normal;color:var(--muted);font-size:15px;line-height:1.8}.board-note{font-size:14px;line-height:1.8;color:var(--muted);margin-top:24px;max-width:800px}[hidden]{display:none!important}.qa{display:grid;grid-template-columns:64px 1fr 1fr;gap:32px;border-top:1px solid var(--line);padding:40px 0}.qa:last-child{border-bottom:1px solid var(--line)}.qa-number{color:#a9b5ff;font-size:14px;padding-top:6px}.qa h3{font-size:24px;line-height:1.4;max-width:400px}.qa p{font-size:16px;line-height:1.8;color:var(--muted)}.qa .pending{display:inline-block;font-size:13px;margin-top:20px;color:#a9b5ff}.citation{padding:80px 0;background:#191b20}.citation .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px}.citation p{color:var(--muted);line-height:1.8;font-size:16px}.footer{padding:32px 0;display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:13px;color:var(--muted)}.footer .wordmark{color:var(--text)}
+@media(max-width:900px){.hero{padding-top:64px}.hero-bottom,.data-intro{gap:40px}.tracks{gap:24px}.track h3{font-size:21px}.paired{gap:32px 64px;padding:32px}.qa{grid-template-columns:36px 1fr;gap:24px}.qa>div:last-child{grid-column:2}.qa h3{max-width:none}.concern{grid-template-columns:1fr;gap:24px}.section-heading{align-items:start}.topbar nav{gap:20px}}
+@media(max-width:600px){.topbar{min-height:72px}.topbar nav{gap:16px;font-size:12px}.topbar nav a:nth-child(2){display:none}.hero{padding:48px 0}.hero h1{font-size:clamp(76px,22vw,110px)}.hero-title{font-size:clamp(25px,6.8vw,34px);margin-top:28px}.hero-bottom{grid-template-columns:1fr;gap:32px;margin-top:32px}.brief{font-size:15px}.button{padding:15px 22px;min-width:132px}.video-slot{aspect-ratio:16/9;border-radius:14px;gap:16px}.play-mark{width:56px;height:56px}.video-slot:before,.video-slot:after{left:16px}.video-slot:before{top:16px}.video-slot:after{bottom:16px}.teaser{padding-bottom:16px}.section{padding:72px 0}.section-heading{display:block;margin-bottom:36px}.section-heading>p{margin-top:24px;font-size:15px}.concern{padding-bottom:40px}.concern p{font-size:26px}.tracks{grid-template-columns:1fr;gap:32px}.track h3{max-width:none;font-size:24px;margin:16px 0 12px}.track .question{margin-top:16px}.data-intro{grid-template-columns:1fr;gap:20px}.data-intro h3{font-size:24px}.paired{grid-template-columns:1fr;padding:24px;gap:24px}.prefix{grid-row:auto;padding-bottom:24px;border-bottom:1px solid var(--line)}.paired-lines{display:none}.branch{border-left:2px solid #727887;padding:0 0 0 20px}.branch.corrective{border-color:var(--accent)}.paired h3{font-size:20px}.data-notes{grid-template-columns:1fr;gap:28px}.data-notes p{font-size:15px}.tabs{gap:8px;margin-bottom:32px}.tabs button{padding:12px 15px;font-size:13px}.board-intro{display:block}.status{display:block;margin-top:12px}.board-intro h3{font-size:20px}th,td{padding:16px 12px}td.empty{padding:40px 20px}.qa{grid-template-columns:24px 1fr;gap:20px;padding:32px 0}.qa h3{font-size:22px}.qa p{font-size:15px}.qa .pending{margin-top:16px}.citation{padding:64px 0}.citation .wrap{grid-template-columns:1fr;gap:24px}.footer{padding:28px 0;font-size:12px}.footer>span{max-width:190px;text-align:right}}
+@media(prefers-reduced-motion:reduce){.hero-copy{animation:none}.button{transition:none}}
+
+/* The immersive background and the standalone teaser are separate media slots. */
+.hero{position:relative;isolation:isolate;display:flex;align-items:center;min-height:calc(100svh - 136px);margin:0 24px 64px;padding:64px 0;border-radius:20px;overflow:hidden;background:#262b33}
+.hero-background{position:absolute;inset:0;z-index:-2;background:#303640;display:flex;align-items:center;padding-left:12%}
+.hero:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#10111400,#10111438 30%,#101114d1 66%,#101114eb)}
+.background-label{display:flex;flex-direction:column;align-items:center;gap:16px;font-size:13px;color:#b5bdcc}.background-note{font-size:13px;color:#a0a9b9}.background-frame{width:64px;height:40px;border:1px solid #b5bdcc65;border-radius:6px}
+.hero-copy{width:60%;margin-left:40%;padding-right:clamp(32px,5vw,88px)}.hero h1{font-size:clamp(80px,9vw,140px)}.hero-title{font-size:clamp(27px,2.6vw,40px);margin-top:28px}.hero-bottom{display:flex;flex-direction:column;align-items:flex-start;gap:32px;margin-top:32px}.brief{max-width:560px}
+@media(max-width:900px){.hero{min-height:720px}.hero-copy{width:64%;margin-left:36%;padding-right:32px}.hero h1{font-size:86px}.hero-title{font-size:30px}.hero-background{padding-left:7%}}
+@media(max-width:600px){.hero{margin:0 12px 48px;min-height:0;border-radius:14px;padding:210px 24px 36px}.hero-copy{width:100%;margin:0;padding:0}.hero h1{font-size:clamp(68px,19vw,100px)}.hero-title{font-size:clamp(25px,6.6vw,32px);margin-top:24px}.hero-background{align-items:flex-start;justify-content:center;padding:32px 0 0}.background-label{gap:10px}.background-frame{width:48px;height:30px}.hero:before{background:linear-gradient(180deg,#10111400,#10111490 23%,#101114ed 43%,#101114fa)}.hero-bottom{gap:28px;margin-top:28px}}
+
+/* One surface changes from the hero frame into the navigation bar. */
+.hero-shell{position:absolute;inset:0;z-index:-1;isolation:isolate;border-radius:inherit;overflow:hidden;background:var(--surface)}
+.hero:before{display:none}.hero-shell:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#10111400,#10111438 30%,#101114d1 66%,#101114eb)}
+.has-morph{scroll-padding-top:0}.has-morph .hero{min-height:calc(100svh - 48px);margin-top:24px;background:transparent;isolation:auto}
+.has-morph .hero-shell{position:fixed;inset:auto;top:var(--shell-top,24px);left:var(--shell-left,24px);width:var(--shell-width,calc(100% - 48px));height:var(--shell-height,calc(100svh - 48px));border-radius:var(--shell-radius,20px);z-index:20;pointer-events:none;box-shadow:0 0 0 1px #ffffff0c}
+.has-morph .hero-shell .hero-background{opacity:var(--media-opacity,1)}.has-morph .hero-shell:before{opacity:var(--media-opacity,1)}
+.has-morph .hero-copy{position:relative;z-index:21;opacity:var(--copy-opacity,1);transform:translateY(var(--copy-shift,0px));animation:none}
+.has-morph .topbar{position:fixed;z-index:30;top:var(--shell-top,24px);left:var(--shell-left,24px);width:var(--shell-width,calc(100% - 48px));height:var(--nav-height,64px);min-height:0;padding:0 32px;margin:0;opacity:var(--nav-opacity,0)}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+.has-morph .hero-shell{background:rgba(25,27,32,var(--shell-alpha,1));-webkit-backdrop-filter:blur(var(--glass-blur,0px)) saturate(140%);backdrop-filter:blur(var(--glass-blur,0px)) saturate(140%);box-shadow:0 0 0 1px #ffffff12,0 8px 32px #0000000f}
+}
+.has-morph .topbar[inert]{pointer-events:none}.skip{z-index:40}
+@media(max-width:600px){.hero-shell:before{background:linear-gradient(180deg,#10111400,#10111490 23%,#101114ed 43%,#101114fa)}.has-morph{scroll-padding-top:0}.has-morph .hero{margin-top:12px;min-height:calc(100svh - 24px)}.has-morph .hero-shell{top:var(--shell-top,12px);left:var(--shell-left,12px);width:var(--shell-width,calc(100% - 24px));height:var(--shell-height,calc(100svh - 24px));border-radius:var(--shell-radius,14px)}.has-morph .topbar{top:var(--shell-top,12px);left:var(--shell-left,12px);width:var(--shell-width,calc(100% - 24px));padding:0 20px}.has-morph .topbar nav{gap:12px;font-size:12px}.has-morph .topbar .wordmark{font-size:17px}}
+
+/* Benchmark table rows share one compact numeric grid. */
+tbody th[scope="row"]{background:transparent;color:var(--text);font-size:14px;font-weight:400;text-align:left}
+table td{font-variant-numeric:tabular-nums}.method-group th{padding-top:28px;padding-bottom:14px;background:transparent;color:#a9b5ff;font-size:13px;text-align:left}
+
+.has-morph .teaser{min-height:100svh;padding-top:104px;padding-bottom:40px;display:flex;align-items:center;justify-content:center}
+.has-morph .teaser .video-slot{width:min(100%,calc((100svh - 144px)*1.777777778));height:auto;min-height:0;aspect-ratio:16/9;overflow:hidden;transform:scale(var(--teaser-scale,.84));transform-origin:center;will-change:transform}
+@media(max-width:600px){.has-morph .teaser{padding-top:88px;padding-bottom:32px}.has-morph .teaser .video-slot{width:min(100%,calc((100svh - 120px)*1.777777778));height:auto;aspect-ratio:16/9}}
+@media(prefers-reduced-motion:reduce){.has-morph .teaser .video-slot{transform:none;will-change:auto}}
+
+/* A single shared highlight and a directional table transition. */
+.tabs{position:relative;isolation:isolate;width:max-content;max-width:100%;margin-inline:auto;padding:6px;gap:4px;flex-wrap:nowrap;background:#ffffff06;border:1px solid var(--line);border-radius:999px}
+.tabs button{position:relative;z-index:1;white-space:nowrap;transition:color .2s;background:transparent!important}
+.tabs button[aria-selected="true"]{color:white}.tabs button:hover{border-color:transparent;color:white}
+.tab-indicator{position:absolute;left:0;top:6px;bottom:6px;width:var(--tab-width,0px);transform:translateX(var(--tab-x,0px));background:var(--accent);border-radius:999px;pointer-events:none;z-index:0}
+.board-stage{position:relative;overflow:hidden;overflow:clip}
+.board-stage>[role="tabpanel"]{width:100%;display:flow-root}
+.board-stage>.is-leaving{position:absolute;top:0;left:0;pointer-events:none}
+@media(max-width:600px){.tabs{width:100%;gap:0;padding:4px}.tabs button{flex:1;min-width:0;padding:12px 8px;font-size:12px}.tab-track{display:none}.tab-indicator{top:4px;bottom:4px}}
+
+/* Neutral navigation highlight follows the section currently in view. */
+.has-morph .topbar nav{position:relative;isolation:isolate;gap:4px;align-items:center}
+.has-morph .topbar nav a{position:relative;z-index:1;display:block;padding:10px 12px;border-radius:999px;white-space:nowrap;transition:color .2s}
+.has-morph .topbar nav a[aria-current="location"]{color:var(--text)}
+.nav-indicator{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px;background:#ffffff16;border:1px solid #ffffff14;pointer-events:none;opacity:0}
+@media(max-width:600px){.has-morph .topbar{gap:12px;padding-inline:16px}.has-morph .topbar nav{gap:0;font-size:11px}.has-morph .topbar nav a{padding:10px 6px}.has-morph .topbar nav a:nth-child(2){display:block}}
+@media(max-width:360px){.has-morph .topbar nav a:nth-child(2){display:none}}
+
+html[data-edge-ready]{overscroll-behavior-y:none}
+.has-morph .hero-shell{transform:perspective(1200px) translateY(var(--edge-y,0px)) rotateX(var(--edge-angle,0deg)) scaleY(var(--edge-scale,1));transform-origin:50% 85%}
+.has-morph .hero-copy{transform:translateY(calc(var(--copy-shift,0px) + var(--edge-copy-y,0px)))}
 </style>
 </head>
 <body>
-<main class="hero" id="top">
-<div class="demo-placeholder" role="img" aria-label="Demo video placeholder"><div class="demo-marker"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 7 25 16 11 25Z"/></svg><span>DEMO VIDEO</span></div></div>
-<header class="hero-copy">
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar wrap"><a class="wordmark" href="#top" aria-label="REGAIN home">REGAIN</a><nav aria-label="Page sections"><span class="nav-indicator" aria-hidden="true"></span><a href="#overview">Overview</a><a href="#data">Data</a><a href="#leaderboard">Leaderboard</a><a href="#research">Research</a></nav></header>
+<main id="main">
+<header class="hero" id="top"><div class="hero-shell"><div class="hero-background" role="img" aria-label="Background video placeholder"><div class="background-label"><span class="background-frame" aria-hidden="true"></span><span>Background video</span><span class="background-note">Placeholder</span></div></div></div><div class="hero-copy">
 <h1>REGAIN</h1>
-<p class="paper-title"><span>Benchmarking Failure Detection and Recovery</span><span>for Robot Foundation Models</span></p>
-<nav class="links" aria-label="Project resources"><a href="#top">Video <span aria-hidden="true">↗</span></a><a href="#top">Code <span aria-hidden="true">↗</span></a></nav>
-<section class="summary" aria-labelledby="summary-heading"><h2 id="summary-heading">In brief</h2><p>REGAIN evaluates when robot foundation models detect a failure, whether they can repair the affected stage, and whether intervention helps complete the task.</p></section>
-</header>
+<p class="hero-title"><span>Benchmarking Failure Handling</span><span>in Robot Foundation Models</span></p>
+<div class="hero-bottom"><nav class="links" aria-label="Project resources"><a class="button primary" href="#teaser">Video <span aria-hidden="true">↗</span></a><a class="button" href="#top">Code <span aria-hidden="true">↗</span></a></nav><p class="brief">REGAIN connects streaming failure detection, state-conditioned stage recovery, and online task rescue to evaluate how robot foundation models handle execution failures.</p></div>
+</div></header>
+<section class="teaser wrap" id="teaser" aria-labelledby="teaser-title"><div class="video-slot"><div class="play-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m7 4 13 8-13 8Z"/></svg></div><div><h2 id="teaser-title">Teaser</h2><p>Demo video placeholder</p></div></div></section>
+<section class="section" id="overview" aria-labelledby="overview-title"><div class="wrap">
+<div class="section-heading"><h2 id="overview-title">Overview</h2><p>Three tracks connect recognition, corrective capability, and the impact of online intervention.</p></div>
+<div class="concern"><h3 class="small-heading">Our key concern</h3><p>Can a robot recognize a failure, repair the affected stage, and complete the original task?</p></div>
+<div class="tracks">
+<article class="track"><span class="number">Track 1</span><h3>Streaming failure detection</h3><p>Detect failures using only the execution history available at the query time. Evaluate alarm correctness and timing.</p><p class="question">When should the robot intervene?</p></article>
+<article class="track"><span class="number">Track 2</span><h3>State-conditioned stage recovery</h3><p>Start from a shared failure state with a local stage goal and a fixed budget. Check whether the affected stage is repaired.</p><p class="question">Can the robot repair this stage?</p></article>
+<article class="track"><span class="number">Track 3</span><h3>Online task rescue</h3><p>Compare matched executions with failure handling enabled or disabled. Measure final task outcomes, rescues, and harm.</p><p class="question">Does intervention help finish the task?</p></article>
+</div></div></section>
+<section class="section data" id="data" aria-labelledby="data-title"><div class="wrap">
+<div class="section-heading"><h2 id="data-title">Data generation</h2><p>Source-policy rollouts, reviewed failure anchors, and independently checked corrective continuations.</p></div>
+<div class="data-intro"><h3>Y-paired data</h3><p>A shared execution prefix and failure state connect the original failed continuation with a corrective branch. Each branch retains its own stage and final-task outcomes.</p></div>
+<figure class="paired" aria-label="Y-paired construction: a shared execution prefix reaches a reviewed failure anchor, then branches into the original failed continuation and a corrective continuation. Stage repair and final task completion are checked separately.">
+<svg class="paired-lines" viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true"><path d="M340 180 H420 Q455 180 475 130 L500 90 H565"/><path d="M420 180 Q455 180 475 230 L500 270 H565"/></svg>
+<div class="prefix"><p class="paired-label">Shared prefix</p><h3>Reviewed failure anchor</h3><p>The same execution history and failed physical state.</p></div>
+<div class="branch"><p class="paired-label">Original branch</p><h3>Source-policy continuation</h3><p>Records the original failed execution.</p></div>
+<div class="branch corrective"><p class="paired-label">Corrective branch</p><h3>Recovery continuation</h3><p>Stage repair and final task completion are independently verified.</p></div>
+</figure>
+<div class="data-notes"><div><h3>Collect and review</h3><p>Record policy rollouts and review failure onset, the affected stage, and failure type.</p></div><div><h3>Generate corrections</h3><p>Collect corrective references through automated recovery and human teleoperation.</p></div><div><h3>Verify and split</h3><p>Check stage and task outcomes separately. Keep a source episode and all its variants in one split.</p></div></div>
+</div></section>
+<section class="section" id="leaderboard" aria-labelledby="leaderboard-title"><div class="wrap">
+<div class="section-heading"><h2 id="leaderboard-title">Leaderboard</h2></div>
+<div class="tabs" role="tablist" aria-label="Benchmark tracks"><span class="tab-indicator" aria-hidden="true"></span><button id="tab-detection" aria-label="Track 1 · Detection" role="tab" aria-selected="true" aria-controls="board-detection" tabindex="0"><span class="tab-track">Track 1 · </span>Detection</button><button id="tab-recovery" aria-label="Track 2 · Recovery" role="tab" aria-selected="false" aria-controls="board-recovery" tabindex="-1"><span class="tab-track">Track 2 · </span>Recovery</button><button id="tab-rescue" aria-label="Track 3 · Task rescue" role="tab" aria-selected="false" aria-controls="board-rescue" tabindex="-1"><span class="tab-track">Track 3 · </span>Task rescue</button></div>
+<div class="board-stage">
+<div id="board-detection" role="tabpanel" aria-labelledby="tab-detection" tabindex="0"><div class="board-intro"><h3>Streaming failure detection</h3></div><div class="table-wrap"><table><caption>Track 1 failure detection results</caption><thead><tr><th scope="col">Method</th><th scope="col">bACC ↑</th><th scope="col">bTWAon ↑</th><th scope="col">Latency (ms) ↓</th></tr></thead><tbody><tr class="method-group"><th colspan="4" scope="rowgroup">Lightweight monitors</th></tr>
+<tr><th scope="row">FailureSpot</th><td>66.8</td><td>59.91</td><td>1.08</td></tr>
+<tr><th scope="row">Hide-and-Seek</th><td>70.4</td><td>59.82</td><td>6.31</td></tr>
+<tr><th scope="row">ActProbe</th><td>70.7</td><td>59.78</td><td>1.37</td></tr>
+<tr><th scope="row">SAFE-MLP</th><td>70.0</td><td>58.96</td><td>9.96</td></tr>
+<tr><th scope="row">STAC</th><td>71.4</td><td>58.43</td><td>12729</td></tr>
+<tr><th scope="row">FIPER</th><td>66.9</td><td>58.29</td><td>17255</td></tr>
+<tr><th scope="row">SAFE-LSTM</th><td>62.8</td><td>57.80</td><td>12.90</td></tr>
+<tr><th scope="row">STAC-Single</th><td>60.3</td><td>54.54</td><td>1793</td></tr>
+<tr><th scope="row">LogpZO</th><td>59.5</td><td>54.16</td><td>118</td></tr>
+<tr class="method-group"><th colspan="4" scope="rowgroup">Small-scale VLM monitors</th></tr>
+<tr><th scope="row">LLaVA-OV-7B FailSafe</th><td>81.4</td><td>74.38</td><td>222</td></tr>
+<tr><th scope="row">Qwen3.5-0.8B FailSafe-style</th><td>78.7</td><td>71.00</td><td>114</td></tr>
+<tr><th scope="row">Qwen3.5-4B FailSafe-style</th><td>77.6</td><td>70.66</td><td>167</td></tr>
+<tr><th scope="row">Robo-Dopamine</th><td>75.3</td><td>61.31</td><td>500</td></tr>
+<tr><th scope="row">RoboMeter</th><td>70.0</td><td>55.22</td><td>402</td></tr>
+<tr><th scope="row">Qwen3-VL-4B</th><td>62.1</td><td>48.56</td><td>485</td></tr>
+<tr><th scope="row">Qwen3.5-4B Base</th><td>53.9</td><td>48.42</td><td>417</td></tr>
+<tr><th scope="row">Qwen3.5-0.8B Base</th><td>58.8</td><td>46.62</td><td>472</td></tr>
+<tr class="method-group"><th colspan="4" scope="rowgroup">API monitors</th></tr>
+<tr><th scope="row">GPT 6.1 Sol Sentinel-Style</th><td>85.1</td><td>72.28</td><td>6242</td></tr>
+<tr><th scope="row">DeepSeek V4.1 Flash Sentinel-Style</th><td>80.1</td><td>65.51</td><td>7123</td></tr>
+<tr><th scope="row">Gemini 3.8 Flash Sentinel-Style</th><td>76.2</td><td>65.25</td><td>34496</td></tr>
+<tr><th scope="row">GPT 6.1 Sol FailSafe-style</th><td>54.9</td><td>39.74</td><td>10551</td></tr>
+<tr><th scope="row">Gemini 3.8 Flash FailSafe-style</th><td>50.5</td><td>31.86</td><td>77301</td></tr>
+<tr><th scope="row">DeepSeek V4.1 Flash FailSafe-style</th><td>51.8</td><td>30.88</td><td>6608</td></tr>
+</tbody></table></div></div>
+<div id="board-recovery" role="tabpanel" aria-labelledby="tab-recovery" tabindex="0" hidden><div class="board-intro"><h3>State-conditioned stage recovery</h3></div><div class="table-wrap"><table><caption>Track 2 stage recovery results</caption><thead><tr><th scope="col">Method</th><th scope="col">VLA · N</th><th scope="col">VLA · Stage SR ↑</th><th scope="col">RDT · N</th><th scope="col">RDT · Stage SR ↑</th><th scope="col">WAM · N</th><th scope="col">WAM · Stage SR ↑</th><th scope="col">Wall time (s) ↓</th></tr></thead><tbody><tr><th scope="row">Source-policy continuation</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">BGR</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">Recovery-SFT</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">Phoenix</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">Astra</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">VERA + IDM</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+</tbody></table></div></div>
+<div id="board-rescue" role="tabpanel" aria-labelledby="tab-rescue" tabindex="0" hidden><div class="board-intro"><h3>Online task rescue</h3></div><div class="table-wrap"><table><caption>Track 3 matched online task outcomes</caption><thead><tr><th scope="col">System</th><th scope="col">Source RFM</th><th scope="col">N</th><th scope="col">OFF SR</th><th scope="col">ON SR</th><th scope="col">Rescue</th><th scope="col">Harm</th><th scope="col">ΔSR ↑</th><th scope="col">Wall (s)</th></tr></thead><tbody><tr><th scope="row">BGR</th><td>VLA · π0.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">Spotter (Astra)</th><td>VLA · π0.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">VLA-Corrector</th><td>VLA · π0.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">CARE</th><td>VLA · π0.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">BGR</th><td>RDT</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">Spotter (Astra)</th><td>RDT</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">BGR</th><td>WAM</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">Spotter (Astra)</th><td>WAM</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+</tbody></table></div></div>
+</div></div></section>
+<section class="section research" id="research" aria-labelledby="research-title"><div class="wrap">
+<div class="section-heading"><h2 id="research-title">Research Q&amp;A</h2><p>Three questions connect the benchmark tracks to the paper’s analyses.</p></div>
+<article class="qa"><span class="qa-number" aria-hidden="true">01</span><h3>How accurate and timely are failure detectors?</h3><div><p>Detection correctness and alarm timing describe different behaviors. We examine both, together with visual-shift robustness, transfer across domains and source models, and query latency.</p><span class="pending">Final analysis pending</span></div></article>
+<article class="qa"><span class="qa-number" aria-hidden="true">02</span><h3>Which failure types can recovery methods repair?</h3><div><p>Category-wise stage recovery reveals which failures each method can address. Matched cases identify shared successes, additional recoveries, and failures unresolved by the evaluated methods.</p><span class="pending">Recovery measurements pending</span></div></article>
+<article class="qa"><span class="qa-number" aria-hidden="true">03</span><h3>When does local recovery improve final task outcomes?</h3><div><p>Independent stage checks and execution traces connect local repair to later task completion. Paired OFF/ON outcomes distinguish rescues, preserved successes, harms, and unresolved failures.</p><span class="pending">Online outcome analysis pending</span></div></article>
+</div></section>
+<section class="citation" id="citation" aria-labelledby="citation-title"><div class="wrap"><h2 id="citation-title">Citation</h2><p>Citation details will be added with the paper release.</p></div></section>
 </main>
+<footer class="footer wrap"><a class="wordmark" href="#top">REGAIN</a><span>Anonymous submission</span></footer>
+<script>
+
+const root = document.documentElement;
+const hero = document.querySelector('.hero');
+const heroCopy = document.querySelector('.hero-copy');
+const topbar = document.querySelector('.topbar');
+const teaser = document.querySelector('#teaser');
+const teaserVideo = teaser.querySelector('.video-slot');
+const overview = document.querySelector('#overview');
+let teaserStop = 0;
+let overviewStop = 0;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let morphFrame = 0;
+let heroHeight = 0;
+let currentScroll = scrollY;
+function drawMorph(time = 0) {
+  morphFrame = 0;
+  const mobile = innerWidth <= 600;
+  const inset = mobile ? 12 : 24;
+  const navHeight = mobile ? 56 : 64;
+  const distance = Math.max(320, Math.min(720, heroHeight * .68));
+  const target = Math.max(0, Math.min(distance, scrollY));
+  // Scroll position is the single clock; no second delayed animation.
+  currentScroll = target;
+  const raw = Math.max(0, Math.min(1, currentScroll / distance));
+  const progress = reducedMotion.matches ? (raw >= .5 ? 1 : 0) : raw * raw * raw * (raw * (raw * 6 - 15) + 10);
+  const teaserProgress = Math.max(0, Math.min(1, scrollY / Math.max(1, teaserStop)));
+  teaserVideo.style.setProperty('--teaser-scale', reducedMotion.matches ? 1 : .84 + .16 * (teaserProgress * teaserProgress * (3 - 2 * teaserProgress)));
+  const finalWidth = Math.min(innerWidth - 2 * inset, 1200);
+  const lerp = (start, end) => start + (end - start) * progress;
+  root.style.setProperty('--shell-top', lerp(inset, mobile ? 12 : 16) + 'px');
+  root.style.setProperty('--shell-left', lerp(inset, (innerWidth - finalWidth) / 2) + 'px');
+  root.style.setProperty('--shell-width', lerp(innerWidth - 2 * inset, finalWidth) + 'px');
+  root.style.setProperty('--shell-height', lerp(heroHeight, navHeight) + 'px');
+  root.style.setProperty('--shell-radius', lerp(mobile ? 14 : 20, mobile ? 16 : 18) + 'px');
+  root.style.setProperty('--nav-height', navHeight + 'px');
+  root.style.setProperty('--copy-opacity', Math.max(0, 1 - progress * 1.8));
+  root.style.setProperty('--copy-shift', (reducedMotion.matches ? 0 : currentScroll * .4) + 'px');
+  root.toggleAttribute('data-edge-ready',scrollY <= 1);
+  root.style.setProperty('--media-opacity', Math.max(0, 1 - progress * 1.6));
+  root.style.setProperty('--nav-opacity', Math.max(0, Math.min(1, (progress - .62) / .38)));
+  const glass = Math.max(0, Math.min(1, (progress - .7) / .3));
+  root.style.setProperty('--shell-alpha', 1 - glass * .5);
+  root.style.setProperty('--glass-blur', (glass * 8).toFixed(2) + 'px');
+  topbar.inert = progress < .72;
+  topbar.setAttribute('aria-hidden', String(progress < .72));
+  heroCopy.inert = progress > .55;
+}
+function queueMorph() {
+  if (!morphFrame) morphFrame = requestAnimationFrame(drawMorph);
+}
+function measureMorph() {
+  heroHeight = hero.offsetHeight;
+  const navBottom = innerWidth <= 600 ? 68 : 80;
+  const rect = teaserVideo.getBoundingClientRect();
+  teaserStop = Math.max(0, scrollY + rect.top + rect.height / 2 - (innerHeight + navBottom) / 2);
+  overviewStop = scrollY + overview.getBoundingClientRect().top;
+  currentScroll = Math.max(0, Math.min(Math.max(320, Math.min(720, heroHeight * .68)), scrollY));
+  queueMorph();
+}
+root.classList.add('has-morph');
+topbar.inert = true;
+measureMorph();
+addEventListener('scroll', queueMorph, {passive:true});
+addEventListener('resize', measureMorph);
+addEventListener('pageshow', measureMorph);
+reducedMotion.addEventListener('change', queueMorph);
+document.fonts.ready.then(measureMorph);
+
+
+// Native scrolling drives the visuals. Only the last part of each passage snaps.
+let passageFrame = 0;
+let passageBusy = false;
+let passageReleased = scrollY >= overviewStop - 4;
+let passageStage = scrollY < teaserStop - 64 ? 'hero' : 'teaser';
+let previousPassageY = scrollY;
+let previousPassageTime = performance.now();
+let passageCooldown = 0;
+function cancelPassage() {
+  cancelAnimationFrame(passageFrame);
+  passageFrame = 0;
+  passageBusy = false;
+}
+function moveToStop(destination, releaseAfter = false, velocity = 0) {
+  cancelPassage();
+  const start = scrollY;
+  const distance = destination - start;
+  const began = performance.now();
+  const duration = Math.min(620, Math.max(460, 460 + Math.abs(distance) * .13));
+  // Carry the gesture's speed into a monotone curve with zero speed at arrival.
+  const slope = velocity ? Math.min(1.8, Math.max(.5, velocity * duration / Math.max(1, Math.abs(distance)))) : 0;
+  passageBusy = true;
+  function finish() {
+    passageFrame = 0;
+    passageBusy = false;
+    passageReleased = releaseAfter;
+    passageStage = releaseAfter ? 'free' : 'teaser';
+    passageCooldown = performance.now() + 180;
+  }
+  if (reducedMotion.matches) { scrollTo(0, destination); finish(); return; }
+  function step(now) {
+    const t = Math.min(1, (now - began) / duration);
+    const eased = (3 * t * t - 2 * t * t * t) + slope * (t * t * t - 2 * t * t + t);
+    scrollTo(0, start + distance * eased);
+    if (t < 1) passageFrame = requestAnimationFrame(step);
+    else finish();
+  }
+  passageFrame = requestAnimationFrame(step);
+}
+function passageInput(delta, event) {
+  if (delta < 0) {
+    cancelPassage();
+    passageCooldown = performance.now() + 180;
+    return;
+  }
+  if (passageReleased) return;
+  const settlingAtTeaser = passageStage === 'teaser' && Math.abs(scrollY - teaserStop) < 32 && performance.now() < passageCooldown;
+  if (passageBusy || settlingAtTeaser) event.preventDefault();
+}
+// A small elastic hinge only at the upper boundary of the hero.
+let edgePosition = 0;
+let edgeGoal = 0;
+let edgeVelocity = 0;
+let edgeFrame = 0;
+let edgeTime = 0;
+let edgeReleaseTimer;
+function paintEdge() {
+  root.style.setProperty('--edge-angle',(-edgePosition*.018).toFixed(3)+'deg');
+  root.style.setProperty('--edge-y',(edgePosition*.12).toFixed(3)+'px');
+  root.style.setProperty('--edge-scale',(1+edgePosition*.000075).toFixed(5));
+  root.style.setProperty('--edge-copy-y',(edgePosition*.05).toFixed(3)+'px');
+}
+function settleEdge(time) {
+  const dt = edgeTime ? Math.min(.032,(time-edgeTime)/1000) : 1/60;
+  edgeTime = time;
+  edgeVelocity += ((edgeGoal-edgePosition)*240-edgeVelocity*27)*dt;
+  edgePosition += edgeVelocity*dt;
+  if (Math.abs(edgeGoal-edgePosition)<.03 && Math.abs(edgeVelocity)<.1) {
+    edgePosition = edgeGoal;
+    edgeVelocity = 0;
+    edgeFrame = 0;
+    edgeTime = 0;
+    paintEdge();
+    return;
+  }
+  paintEdge();
+  edgeFrame = requestAnimationFrame(settleEdge);
+}
+function releaseEdge() {
+  clearTimeout(edgeReleaseTimer);
+  edgeGoal = 0;
+  if (!edgeFrame && edgePosition) edgeFrame = requestAnimationFrame(settleEdge);
+}
+function pullHeroEdge(delta,event) {
+  if (reducedMotion.matches || passageBusy || scrollY > 1 || delta >= 0) return false;
+  event.preventDefault();
+  edgeGoal = Math.min(40,edgeGoal+Math.min(10,Math.abs(delta)*.15));
+  if (!edgeFrame) edgeFrame = requestAnimationFrame(settleEdge);
+  clearTimeout(edgeReleaseTimer);
+  edgeReleaseTimer = setTimeout(releaseEdge,110);
+  return true;
+}
+addEventListener('scroll',() => { if (scrollY>1) releaseEdge(); },{passive:true});
+reducedMotion.addEventListener('change',() => {
+  if (!reducedMotion.matches) return;
+  cancelAnimationFrame(edgeFrame);
+  clearTimeout(edgeReleaseTimer);
+  edgeFrame = 0;
+  edgeTime = 0;
+  edgePosition = edgeGoal = edgeVelocity = 0;
+  paintEdge();
+});
+addEventListener('touchend',releaseEdge,{passive:true});
+addEventListener('touchcancel',releaseEdge,{passive:true});
+addEventListener('wheel', event => {
+  if (event.ctrlKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+  if (event.target.closest('.table-wrap,video,input,textarea,select')) return;
+  const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1;
+  if (pullHeroEdge(event.deltaY*unit,event)) return;
+  if (event.deltaY>0) releaseEdge();
+  passageInput(event.deltaY,event);
+}, {passive:false});
+let touchY = 0;
+let touchX = 0;
+addEventListener('touchstart', event => {
+  if (event.touches.length !== 1) return;
+  touchY = event.touches[0].clientY;
+  touchX = event.touches[0].clientX;
+}, {passive:true});
+addEventListener('touchmove', event => {
+  if (event.touches.length !== 1 || event.target.closest('.table-wrap,video,input,textarea,select')) return;
+  const point = event.touches[0];
+  const delta = touchY - point.clientY;
+  const horizontal = touchX - point.clientX;
+  touchY = point.clientY;
+  touchX = point.clientX;
+  if (Math.abs(delta) >= Math.abs(horizontal)) {
+    if (pullHeroEdge(delta,event)) return;
+    if (delta>0) releaseEdge();
+    passageInput(delta,event);
+  }
+}, {passive:false});
+addEventListener('keydown', event => {
+  if (event.target.closest('input,textarea,select,[contenteditable]') || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.key === 'Escape') { cancelPassage(); passageReleased = true; return; }
+  if (['Home','End','ArrowUp','PageUp'].includes(event.key) || (event.key === ' ' && event.shiftKey)) {
+    cancelPassage(); passageCooldown = performance.now() + 180; return;
+  }
+  if (event.target.closest('button,a')) return;
+  if (['PageDown','ArrowDown',' '].includes(event.key)) passageInput(1, event);
+});
+addEventListener('scroll', () => {
+  const now = performance.now();
+  const delta = scrollY - previousPassageY;
+  const velocity = delta / Math.max(16, now - previousPassageTime);
+  previousPassageY = scrollY;
+  previousPassageTime = now;
+  if (passageBusy) return;
+  if (scrollY < 8) { passageReleased = false; passageStage = 'hero'; passageCooldown = 0; }
+  else if (scrollY >= overviewStop - 4) { passageReleased = true; passageStage = 'free'; }
+  if (passageReleased || delta <= 0 || now < passageCooldown) return;
+  const origin = passageStage === 'hero' ? 0 : teaserStop;
+  const threshold = Math.min(180, Math.max(110, innerHeight * .18));
+  if (scrollY >= origin + threshold) {
+    const leavingHero = passageStage === 'hero';
+    moveToStop(leavingHero ? teaserStop : overviewStop, !leavingHero, velocity);
+  }
+}, {passive:true});
+addEventListener('resize', () => { cancelPassage(); passageCooldown = performance.now() + 180; });
+addEventListener('click', event => {
+  const link = event.target.closest('a[href^="#"]');
+  if (!link) return;
+  cancelPassage();
+  const href = link.getAttribute('href');
+  if (link.closest('.topbar')) {
+    const target = document.querySelector(href);
+    if (!target) return;
+    event.preventDefault();
+    passageReleased = href !== '#top';
+    passageStage = passageReleased ? 'free' : 'hero';
+    passageCooldown = 0;
+    const destination = href === '#top' ? 0 : Math.max(0, scrollY + target.getBoundingClientRect().top);
+    scrollTo({top:destination,behavior:reducedMotion.matches ? 'instant' : 'smooth'});
+    history.pushState(null,'',href);
+    return;
+  }
+  if (href === '#teaser') {
+    event.preventDefault();
+    moveToStop(teaserStop);
+  } else {
+    passageReleased = href !== '#top' && href !== '#main';
+    passageStage = passageReleased ? 'free' : 'hero';
+    passageCooldown = passageReleased ? performance.now() + 180 : 0;
+  }
+});
+
+const tabs = [...document.querySelectorAll('[role="tab"]')];
+const tabbar = document.querySelector('.tabs');
+const tabIndicator = document.querySelector('.tab-indicator');
+const boardStage = document.querySelector('.board-stage');
+const boardPanels = tabs.map(tab => document.getElementById(tab.getAttribute('aria-controls')));
+let indicatorAnimation;
+let boardAnimations = [];
+let boardGeneration = 0;
+function moveFluidIndicator(container,indicator,target,animation,animate) {
+  const old = indicator.getBoundingClientRect();
+  const bounds = container.getBoundingClientRect();
+  const fromX = old.left - bounds.left - container.clientLeft;
+  const toX = target.offsetLeft;
+  const width = target.offsetWidth;
+  animation?.cancel();
+  indicator.style.transform = `translateX(${toX}px)`;
+  indicator.style.width = width+'px';
+  if (!animate || reducedMotion.matches) return;
+  const bridgeLeft = Math.min(fromX,toX);
+  const bridgeWidth = Math.max(fromX+old.width,toX+width)-bridgeLeft;
+  return indicator.animate([
+    {transform:`translateX(${fromX}px)`,width:old.width+'px'},
+    {transform:`translateX(${bridgeLeft}px)`,width:bridgeWidth+'px',offset:.38},
+    {transform:`translateX(${toX}px)`,width:width+'px'}
+  ],{duration:440,easing:'cubic-bezier(.25,.8,.25,1)'});
+}
+function positionIndicator(tab,animate = false) {
+  indicatorAnimation = moveFluidIndicator(tabbar,tabIndicator,tab,indicatorAnimation,animate);
+}
+function clearBoardTransition(selected) {
+  boardGeneration++;
+  boardAnimations.forEach(animation => animation.cancel());
+  boardAnimations = [];
+  boardStage.style.height = '';
+  boardPanels.forEach((panel,index) => {
+    panel.classList.remove('is-leaving');
+    panel.hidden = index !== selected;
+    panel.inert = index !== selected;
+    if (index === selected) panel.removeAttribute('aria-hidden');
+    else panel.setAttribute('aria-hidden','true');
+  });
+}
+function activate(tab) {
+  const previous = tabs.findIndex(item => item.getAttribute('aria-selected') === 'true');
+  const next = tabs.indexOf(tab);
+  if (next === previous) return;
+  const oldHeight = boardStage.getBoundingClientRect().height;
+  const oldTransform = getComputedStyle(boardPanels[previous]).transform;
+  const oldOpacity = getComputedStyle(boardPanels[previous]).opacity;
+  positionIndicator(tab,true);
+  clearBoardTransition(next);
+  tabs.forEach(item => {
+    const selected = item === tab;
+    item.setAttribute('aria-selected',String(selected));
+    item.tabIndex = selected ? 0 : -1;
+  });
+  if (reducedMotion.matches) return;
+  const direction = next > previous ? 1 : -1;
+  const outgoing = boardPanels[previous];
+  const incoming = boardPanels[next];
+  const newHeight = incoming.offsetHeight;
+  outgoing.hidden = false;
+  outgoing.classList.add('is-leaving');
+  boardStage.style.height = newHeight+'px';
+  const timing = {duration:440,easing:'cubic-bezier(.25,.8,.25,1)'};
+  boardAnimations = [
+    outgoing.animate([{transform:oldTransform,opacity:oldOpacity},{transform:`translateX(${-direction*100}%)`,opacity:0}],timing),
+    incoming.animate([{transform:`translateX(${direction*100}%)`,opacity:.35},{transform:'translateX(0)',opacity:1}],timing),
+    boardStage.animate([{height:oldHeight+'px'},{height:newHeight+'px'}],timing)
+  ];
+  const generation = boardGeneration;
+  Promise.all(boardAnimations.map(animation => animation.finished)).then(() => {
+    if (generation === boardGeneration) clearBoardTransition(next);
+  }).catch(() => {});
+}
+function resetBoardLayout() {
+  const selected = tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true');
+  clearBoardTransition(selected);
+  positionIndicator(tabs[selected]);
+}
+addEventListener('resize',resetBoardLayout);
+reducedMotion.addEventListener('change',resetBoardLayout);
+document.fonts.ready.then(resetBoardLayout);
+resetBoardLayout();
+const sectionNav = document.querySelector('.topbar nav');
+const navIndicator = document.querySelector('.nav-indicator');
+const sectionLinks = [...sectionNav.querySelectorAll('a')];
+let navAnimation;
+let currentSectionLink;
+let navFrame = 0;
+function syncSectionNav(animate = true) {
+  navFrame = 0;
+  const marker = (innerWidth <= 600 ? 68 : 80) + 96;
+  let active;
+  sectionLinks.forEach(link => {
+    if (link.offsetWidth && document.querySelector(link.getAttribute('href')).getBoundingClientRect().top <= marker) active = link;
+  });
+  sectionLinks.forEach(link => {
+    if (link === active) link.setAttribute('aria-current','location');
+    else link.removeAttribute('aria-current');
+  });
+  navIndicator.style.opacity = active ? '1' : '0';
+  if (active && (active !== currentSectionLink || !animate)) {
+    navAnimation = moveFluidIndicator(sectionNav,navIndicator,active,navAnimation,animate && !!currentSectionLink);
+  }
+  currentSectionLink = active;
+}
+function queueSectionNav() {
+  if (!navFrame) navFrame = requestAnimationFrame(() => syncSectionNav());
+}
+addEventListener('scroll',queueSectionNav,{passive:true});
+addEventListener('resize',() => syncSectionNav(false));
+document.fonts.ready.then(() => syncSectionNav(false));
+syncSectionNav(false);
+
+tabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => activate(tab));
+  tab.addEventListener('keydown', event => {
+    let next;
+    if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+    if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = tabs.length - 1;
+    if (next === undefined) return;
+    event.preventDefault();
+    activate(tabs[next]);
+    tabs[next].focus();
+  });
+});
+</script>
 </body>
 </html>
