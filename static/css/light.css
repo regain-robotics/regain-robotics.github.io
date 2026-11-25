@@ -82,20 +82,73 @@
 [data-theme="light"] .branch.corrective h3,
 [data-theme="light"] .qa-number,
 [data-theme="light"] .qa .pending,
-[data-theme="light"] .method-group th {
+[data-theme="light"] .method-group th,
+[data-theme="light"] .stat-label,
+[data-theme="light"] .track-meta,
+[data-theme="light"] .qa-takeaway,
+[data-theme="light"] .agree-tag,
+[data-theme="light"] .case-steps b {
+  color: var(--accent) !important;
+}
+[data-theme="light"] .button-muted {
+  border-color: #17203324;
+}
+[data-theme="light"] .bar-track {
+  background: #17203310;
+}
+[data-theme="light"] .benchmark-compare .mark-yes {
+  color: #0c6b45;
+}
+[data-theme="light"] .benchmark-compare .mark-no {
+  color: #8b94a5;
+}
+[data-theme="light"] .res-inc,
+[data-theme="light"] .res-inc-swatch {
+  background: #dfe4ee;
+  color: #4e5665;
+}
+[data-theme="light"] .offset-val b {
   color: var(--accent);
 }
+[data-theme="light"] .offset-val.is-alt b {
+  color: #087f77;
+}
+[data-theme="light"] .real-robot {
+  background: #edf0f5;
+}
+[data-theme="light"] .agree-card,
+[data-theme="light"] .real-table-block,
+[data-theme="light"] .case-card,
+[data-theme="light"] .comp-card,
+[data-theme="light"] .benchmark-compare {
+  background: #fff;
+}
+[data-theme="light"] .real-table thead th,
+[data-theme="light"] .benchmark-compare thead th {
+  background: transparent;
+}
+[data-theme="light"] .offset-cell {
+  background: #fff;
+}
+[data-theme="light"] .offset-cell.is-onset {
+  background: #edf1ff;
+}
+[data-theme="light"] .case-badge.is-success { color: #0c6b45; background: #e2f6ec; border-color: #9ddbc0; }
+[data-theme="light"] .case-badge.is-partial { color: #9a5d07; background: #fef5e3; border-color: #ebd098; }
+[data-theme="light"] .case-badge.is-fail { color: #b4232c; background: #fdebed; border-color: #f4b7bd; }
 [data-theme="light"] .data {
   background: #edf0f5;
 }
-[data-theme="light"] .paired,
-[data-theme="light"] .branch {
+[data-theme="light"] .paired {
   background: #fff;
+}
+[data-theme="light"] .branch {
+  background: transparent;
 }
 [data-theme="light"] .paired-lines path {
   stroke: #8a94a6;
 }
-[data-theme="light"] .paired-lines path:last-child {
+[data-theme="light"] .paired-lines path.paired-corr {
   stroke: var(--accent);
 }
 [data-theme="light"] th {

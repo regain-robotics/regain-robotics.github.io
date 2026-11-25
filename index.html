@@ -3,21 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="REGAIN evaluates streaming failure detection, stage recovery, and online task rescue for robot foundation models.">
+<meta name="description" content="REGAIN benchmarks streaming failure detection, state-conditioned stage recovery, and online task rescue across 12,000 Y-shaped records and real Franka robots.">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#101114">
 <title>REGAIN: Benchmarking Failure Handling in Robot Foundation Models</title>
-<script src="static/js/theme.js?v=20261114b"></script>
-<link rel="stylesheet" href="static/css/site.css">
-<link rel="stylesheet" href="static/css/light.css?v=20261114c">
-<link rel="stylesheet" href="static/css/recovery.css?v=20261114b">
-<script src="static/js/scroll.js?v=20261114b" defer></script>
-<script src="static/js/navigation.js" defer></script>
-<script src="static/js/recovery.js" defer></script>
+<script src="static/js/theme.js?v=20261119a"></script>
+<link rel="stylesheet" href="static/css/site.css?v=20261125e">
+<link rel="stylesheet" href="static/css/leaderboard.css?v=20261119a">
+<link rel="stylesheet" href="static/css/light.css?v=20261124a">
+<link rel="stylesheet" href="static/css/recovery.css?v=20261125e">
+<link rel="stylesheet" href="static/css/diagrams.css?v=20261125e">
+<script src="static/js/scroll.js?v=20261119a" defer></script>
+<script src="static/js/leaderboard.js?v=20261119a" defer></script>
+<script src="static/js/navigation.js?v=20261119a" defer></script>
+<script src="static/js/recovery.js?v=20261125e" defer></script>
+<script src="static/js/animations.js?v=20261125d" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="topbar wrap"><a class="wordmark" href="#top" aria-label="REGAIN home">REGAIN</a><nav aria-label="Page sections"><span class="nav-indicator" aria-hidden="true"></span><a href="#overview">Overview</a><a href="#data">Data</a><a href="#recovery">Recovery</a><a href="#leaderboard">Leaderboard</a><a href="#research">Research</a></nav><button class="theme-toggle" type="button" aria-label="Switch to light theme" aria-pressed="false" title="Switch to light theme">
+<header class="topbar wrap"><a class="wordmark" href="#top" aria-label="REGAIN home">REGAIN</a><nav aria-label="Page sections"><span class="nav-indicator" aria-hidden="true"></span><a href="#overview">Overview</a><a href="#data">Data</a><a href="#recovery">Recovery</a><a href="#leaderboard">Leaderboard</a><a href="#research">Research</a><a href="#real-robot">Real robot</a></nav><button class="theme-toggle" type="button" aria-label="Switch to light theme" aria-pressed="false" title="Switch to light theme">
 <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg>
 <svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/></svg>
 </button></header>
@@ -29,143 +33,841 @@
 </button><div class="hero-shell"><div class="hero-background" role="img" aria-label="Background video placeholder"><div class="background-label"><span class="background-frame" aria-hidden="true"></span><span>Background video</span><span class="background-note">Placeholder</span></div></div></div><div class="hero-copy">
 <h1>REGAIN</h1>
 <p class="hero-title"><span>Benchmarking Failure Handling</span><span>in Robot Foundation Models</span></p>
-<div class="hero-bottom"><nav class="links" aria-label="Project resources"><a class="button primary" href="#teaser">Video <span aria-hidden="true">↗</span></a><a class="button" href="#top">Code <span aria-hidden="true">↗</span></a></nav><p class="brief">REGAIN connects streaming failure detection, state-conditioned stage recovery, and online task rescue to evaluate how robot foundation models handle execution failures.</p></div>
+<div class="hero-bottom"><nav class="links" aria-label="Project resources"><a class="button primary" href="#teaser">Video <span aria-hidden="true">↗</span></a><a class="button" href="#leaderboard">Leaderboard <span aria-hidden="true">↓</span></a><span class="button button-muted" aria-disabled="true">Paper · Code · Dataset · Coming soon</span></nav><p class="brief">REGAIN connects streaming failure detection, state-conditioned stage recovery, and online task rescue across 12,000 Y-shaped records, three simulation platforms, eight source RFMs, and physical Franka evaluations.</p></div>
 </div></header>
 <section class="teaser wrap" id="teaser" aria-labelledby="teaser-title"><div class="video-slot"><div class="play-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m7 4 13 8-13 8Z"/></svg></div><div><h2 id="teaser-title">Teaser</h2><p>Demo video placeholder</p></div></div></section>
 <section class="section" id="overview" aria-labelledby="overview-title"><div class="wrap">
 <div class="section-heading"><h2 id="overview-title">Overview</h2><p>Three tracks connect recognition, corrective capability, and the impact of online intervention.</p></div>
-<div class="concern"><h3 class="small-heading">Our key concern</h3><p>Can a robot recognize a failure, repair the affected stage, and complete the original task?</p></div>
-<div class="tracks">
-<article class="track"><span class="number">Track 1</span><h3>Streaming failure detection</h3><p>Detect failures using only the execution history available at the query time. Evaluate alarm correctness and timing.</p><p class="question">When should the robot intervene?</p></article>
-<article class="track"><span class="number">Track 2</span><h3>State-conditioned stage recovery</h3><p>Start from a shared failure state with a local stage goal and a fixed budget. Check whether the affected stage is repaired.</p><p class="question">Can the robot repair this stage?</p></article>
-<article class="track"><span class="number">Track 3</span><h3>Online task rescue</h3><p>Compare matched executions with failure handling enabled or disabled. Measure final task outcomes, rescues, and harm.</p><p class="question">Does intervention help finish the task?</p></article>
-</div></div></section>
+<div class="concern"><h3 class="small-heading">Our key concern</h3><p>Can a robot recognize a failure on time, repair the affected task stage, and complete the original task?</p></div>
+<div class="overview-stats" aria-label="Benchmark scale summary">
+  <div class="stat-card"><span class="stat-value">12,000</span><span class="stat-label">Y-shaped records</span><span class="stat-note">3,000 original + 9,000 variants</span></div>
+  <div class="stat-card"><span class="stat-value">3 + 2</span><span class="stat-label">Sim &amp; real setups</span><span class="stat-note">ManiSkill, RoboTwin, RoboLab + 1/2-arm Franka</span></div>
+  <div class="stat-card"><span class="stat-value">33 + 8</span><span class="stat-label">Manipulation tasks</span><span class="stat-note">33 simulation + 8 physical tasks</span></div>
+  <div class="stat-card"><span class="stat-value">8</span><span class="stat-label">Source RFMs</span><span class="stat-note">VLA · RDT · WAM families</span></div>
+</div>
+<div class="proto-sticky-track" id="protocol-stage" aria-label="REGAIN three-track evaluation protocol">
+  <div class="proto-sticky-viewport">
+    <div class="proto-spine" aria-hidden="true">
+      <div class="proto-spine-rail"><span class="proto-spine-fill"></span></div>
+      <span class="proto-spine-step is-active" data-spine-step="0">01</span>
+      <span class="proto-spine-step" data-spine-step="1">02</span>
+      <span class="proto-spine-step" data-spine-step="2">03</span>
+    </div>
+    <div class="proto-acts-stage">
+      <!-- Act 1: Streaming Failure Detection -->
+      <div class="proto-act-pair" data-act="0">
+        <article class="proto-act-copy">
+          <span class="proto-act-eyebrow">Track 1</span>
+          <h3>Streaming failure detection</h3>
+          <p>Detect failures using only the execution prefix available at query time. Evaluates onset alignment and false alarms separately from query latency under Lorentzian timing weights <em>w</em>(<em>d</em>).</p>
+          <p class="question">When should the robot intervene?</p>
+        </article>
+        <div class="proto-act-visual">
+          <svg class="proto-act-svg" viewBox="0 0 640 420" role="img" aria-label="Track 1 aligned five-monitor alarm timeline and Lorentzian timing-weight curve">
+            <defs>
+              <clipPath id="t1-curve-clip"><rect data-t1-clip x="78" y="210" width="444" height="170"/></clipPath>
+            </defs>
+            <text class="svg-muted" x="78" y="34" font-size="13" font-weight="500">Monitor alarms</text>
+            <text class="svg-muted" x="608" y="34" font-size="13" font-variant-numeric="tabular-nums" text-anchor="end" data-t1-scan-readout>d = +5.0 s</text>
+
+            <!-- Strictly aligned vertical dashed drop-lines -->
+            <line data-t1-drop="gt" x1="243" y1="66" x2="243" y2="364" stroke="var(--diag-amber)" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.7"/>
+            <line data-t1-drop="a" x1="133" y1="94" x2="133" y2="306" stroke="var(--diag-mint)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.65"/>
+            <line data-t1-drop="b" x1="298" y1="122" x2="298" y2="271.2" stroke="var(--diag-accent)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.75"/>
+            <line data-t1-drop="c" x1="463" y1="150" x2="463" y2="340.8" stroke="var(--diag-coral)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.65"/>
+            <line data-t1-drop="d" x1="582" y1="178" x2="582" y2="364" stroke="var(--diag-neutral)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.55"/>
+
+            <!-- Five monitor horizontal rails -->
+            <text x="60" y="70" font-size="12.5" font-weight="600" text-anchor="end">GT</text>
+            <line class="geo-axis" x1="78" y1="66" x2="528" y2="66"/>
+            <line class="geo-axis" x1="556" y1="66" x2="608" y2="66" opacity="0.45"/>
+
+            <text class="svg-mint" x="60" y="98" font-size="12.5" font-weight="600" text-anchor="end">A</text>
+            <line class="geo-grid" x1="78" y1="94" x2="528" y2="94"/>
+            <line class="geo-grid" x1="556" y1="94" x2="608" y2="94"/>
+
+            <text class="svg-accent" x="60" y="126" font-size="12.5" font-weight="600" text-anchor="end">B</text>
+            <line class="geo-grid" x1="78" y1="122" x2="528" y2="122"/>
+            <line class="geo-grid" x1="556" y1="122" x2="608" y2="122"/>
+
+            <text class="svg-coral" x="60" y="154" font-size="12.5" font-weight="600" text-anchor="end">C</text>
+            <line class="geo-grid" x1="78" y1="150" x2="528" y2="150"/>
+            <line class="geo-grid" x1="556" y1="150" x2="608" y2="150"/>
+
+            <text class="svg-muted" x="60" y="182" font-size="12.5" font-weight="600" text-anchor="end">D</text>
+            <line class="geo-grid" x1="78" y1="178" x2="528" y2="178"/>
+            <line class="geo-grid" x1="556" y1="178" x2="608" y2="178"/>
+
+            <!-- Alarm markers -->
+            <g data-t1-mark="gt">
+              <circle cx="243" cy="66" r="8" fill="none" stroke="var(--diag-amber)" stroke-width="1.4"/>
+              <circle cx="243" cy="66" r="3.4" fill="var(--diag-amber)"/>
+              <text class="svg-amber" x="256" y="59" font-size="11.5" font-weight="600">t*</text>
+            </g>
+            <rect data-t1-mark="a" x="-4.5" y="-4.5" width="9" height="9" transform="translate(133 94) rotate(45)" fill="var(--diag-mint)"/>
+            <rect data-t1-mark="b" x="-4.5" y="-4.5" width="9" height="9" transform="translate(298 122) rotate(45)" fill="var(--diag-accent)"/>
+            <rect data-t1-mark="c" x="-4.5" y="-4.5" width="9" height="9" transform="translate(463 150) rotate(45)" fill="var(--diag-coral)"/>
+            <circle data-t1-mark="d" cx="582" cy="178" r="4.5" fill="var(--bg)" stroke="var(--diag-neutral)" stroke-width="1.8"/>
+
+            <!-- Scroll-driven vertical scanline -->
+            <line data-t1-playhead x1="298" y1="48" x2="298" y2="190" stroke="var(--diag-accent)" stroke-width="1.4" opacity="0.75"/>
+
+            <!-- Lower Lorentzian w(d) curve -->
+            <text class="svg-muted svg-text-halo" x="78" y="216" font-size="12.5" font-weight="500">w(d) = 1 / (1 + (d / τ)²)</text>
+            <text class="svg-muted svg-text-halo" x="608" y="216" font-size="12.5" text-anchor="end">τ = 10 s</text>
+
+            <rect x="133" y="248" width="220" height="116" fill="color-mix(in srgb, #4d6bff 5%, transparent)"/>
+            <text class="svg-muted" x="518" y="238" font-size="11" text-anchor="end" opacity="0.8">±τ (w ≥ 0.5)</text>
+
+            <line class="geo-grid" x1="78" y1="248" x2="528" y2="248"/>
+            <line class="geo-grid" x1="78" y1="306" x2="528" y2="306"/>
+            <line class="geo-axis" x1="78" y1="364" x2="528" y2="364"/>
+            <path stroke="var(--line)" stroke-width="1.4" fill="none" d="M 534 371 L 543 357 M 543 371 L 552 357"/>
+            <line class="geo-axis" x1="556" y1="364" x2="608" y2="364"/>
+
+            <text class="svg-muted" x="60" y="252" font-size="11.5" text-anchor="end">1.0</text>
+            <text class="svg-muted" x="60" y="310" font-size="11.5" text-anchor="end">0.5</text>
+            <text class="svg-muted" x="60" y="368" font-size="11.5" text-anchor="end">0.0</text>
+
+            <!-- Subtle full rail + progressive clipped draw -->
+            <path class="geo-rail" data-t1-curve-rail stroke="var(--diag-accent)" d="M 78 328 Q 180 292 243 248 Q 338 318 518 348"/>
+            <g clip-path="url(#t1-curve-clip)">
+              <path data-t1-curve-fill d="M 78 364 L 243 248 L 518 364 Z" fill="color-mix(in srgb, #4d6bff 12%, transparent)"/>
+              <path data-t1-curve-stroke d="M 78 328 Q 180 292 243 248 Q 338 318 518 348" fill="none" stroke="var(--diag-accent)" stroke-width="2.2"/>
+            </g>
+
+            <!-- Exact value nodes & callouts -->
+            <g data-t1-val="a">
+              <circle cx="133" cy="306" r="4" fill="var(--diag-mint)"/>
+              <text class="svg-mint svg-text-halo" x="133" y="293" font-size="12" font-weight="600" text-anchor="middle">0.50</text>
+            </g>
+            <g data-t1-val="gt">
+              <circle cx="243" cy="248" r="4.5" fill="var(--diag-amber)"/>
+              <text class="svg-amber svg-text-halo" x="243" y="235" font-size="12" font-weight="600" text-anchor="middle">1.00</text>
+            </g>
+            <g data-t1-val="b">
+              <circle cx="298" cy="271.2" r="4" fill="var(--diag-accent)"/>
+              <text class="svg-accent svg-text-halo" x="298" y="258" font-size="12" font-weight="600" text-anchor="middle">0.80</text>
+            </g>
+            <g data-t1-val="c">
+              <circle cx="463" cy="340.8" r="4" fill="var(--diag-coral)"/>
+              <text class="svg-coral svg-text-halo" x="463" y="328" font-size="12" font-weight="600" text-anchor="middle">0.20</text>
+            </g>
+            <g data-t1-val="d">
+              <circle cx="582" cy="364" r="4.5" fill="var(--bg)" stroke="var(--diag-neutral)" stroke-width="1.8"/>
+              <text class="svg-muted svg-text-halo" x="582" y="350" font-size="12" font-weight="600" text-anchor="middle">0.00</text>
+            </g>
+
+            <text class="svg-mint" x="133" y="388" font-size="12" font-weight="550" text-anchor="middle">−10</text>
+            <text class="svg-amber" x="243" y="388" font-size="12" font-weight="550" text-anchor="middle">0</text>
+            <text class="svg-accent" x="298" y="388" font-size="12" font-weight="550" text-anchor="middle">+5</text>
+            <text class="svg-coral" x="463" y="388" font-size="12" font-weight="550" text-anchor="middle">+20</text>
+            <text class="svg-muted" x="582" y="388" font-size="12.5" font-weight="550" text-anchor="middle">+∞</text>
+            <text class="svg-muted" x="298" y="412" font-size="12" text-anchor="middle">Alarm offset d (s)</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Act 2: State-Conditioned Stage Recovery -->
+      <div class="proto-act-pair" data-act="1">
+        <article class="proto-act-copy">
+          <span class="proto-act-eyebrow">Track 2</span>
+          <h3>State-conditioned stage recovery</h3>
+          <p>Start from a reconstructed shared failure state <em>s</em>* under common local goals and physical budgets. Checks stage repair independently of final task completion.</p>
+          <p class="question">Can the robot repair this stage?</p>
+        </article>
+        <div class="proto-act-visual">
+          <svg class="proto-act-svg" viewBox="0 0 640 420" role="img" aria-label="Track 2 state-space phase diagram showing recovery trajectories branching from s*">
+            <line class="geo-grid" x1="54" y1="120" x2="586" y2="120"/>
+            <line class="geo-grid" x1="54" y1="210" x2="586" y2="210"/>
+            <line class="geo-grid" x1="54" y1="300" x2="586" y2="300"/>
+            <line class="geo-grid" x1="186" y1="68" x2="186" y2="364"/>
+            <line class="geo-grid" x1="355" y1="68" x2="355" y2="364"/>
+            <line class="geo-axis" x1="524" y1="68" x2="524" y2="364"/>
+
+            <text class="svg-muted" x="54" y="34" font-size="13" font-weight="500">State-space trajectories from s*</text>
+            <text class="svg-mint" x="524" y="56" font-size="12.5" font-weight="550" text-anchor="end">Goal: stage cond.</text>
+
+            <!-- Gate threshold & dashed Stage success gate -->
+            <line x1="186" y1="258" x2="524" y2="258" stroke="var(--line)" stroke-width="1.1" stroke-dasharray="3 4" opacity="0.7"/>
+            <rect x="508" y="78" width="32" height="162" rx="6" fill="color-mix(in srgb, #5dd8bd 7%, transparent)" stroke="var(--diag-mint)" stroke-width="1.2" stroke-dasharray="4 4"/>
+
+            <!-- Prefix rail & trace -->
+            <path class="geo-rail" stroke="var(--diag-neutral)" d="M 54 210 H 186"/>
+            <path class="geo-trace" data-t2-prefix stroke="var(--diag-neutral)" d="M 54 210 H 186"/>
+            <line x1="54" y1="204" x2="54" y2="216" stroke="var(--diag-neutral)" stroke-width="1.4"/>
+            <text class="svg-muted" x="54" y="194" font-size="11.5">t₀</text>
+            <text class="svg-muted" x="120" y="194" font-size="11.5" text-anchor="middle">Prefix</text>
+
+            <!-- Candidate rails & animated traces -->
+            <path class="geo-rail" stroke="var(--diag-mint)" d="M 186 210 C 276 210, 324 120, 524 120"/>
+            <path class="geo-rail" stroke="var(--diag-accent)" d="M 186 210 C 280 210, 320 256, 384 234 C 432 218, 464 196, 524 196"/>
+            <path class="geo-rail" stroke="var(--diag-coral)" d="M 186 210 C 282 210, 336 322, 524 322"/>
+
+            <path class="geo-trace" data-t2-trace="r1" stroke="var(--diag-mint)" d="M 186 210 C 276 210, 324 120, 524 120"/>
+            <path class="geo-trace" data-t2-trace="r2" stroke="var(--diag-accent)" d="M 186 210 C 280 210, 320 256, 384 234 C 432 218, 464 196, 524 196"/>
+            <path class="geo-trace" data-t2-trace="r3" stroke="var(--diag-coral)" d="M 186 210 C 282 210, 336 322, 524 322"/>
+
+            <rect data-t2-cursor="r1" x="183" y="207" width="6" height="6" fill="var(--diag-mint)"/>
+            <rect data-t2-cursor="r2" x="183" y="207" width="6" height="6" fill="var(--diag-accent)"/>
+            <rect data-t2-cursor="r3" x="183" y="207" width="6" height="6" fill="var(--diag-coral)"/>
+
+            <!-- Waypoint & endpoints -->
+            <circle cx="384" cy="234" r="3.5" fill="var(--bg)" stroke="var(--diag-accent)" stroke-width="1.4"/>
+            <circle data-t2-end="r1" cx="524" cy="120" r="4" fill="var(--diag-mint)"/>
+            <circle data-t2-end="r2" cx="524" cy="196" r="4" fill="var(--diag-accent)"/>
+            <circle data-t2-end="r3" cx="524" cy="322" r="4" fill="var(--diag-coral)"/>
+
+            <!-- Inline annotations -->
+            <g data-t2-ann="r1">
+              <text class="svg-mint svg-text-halo" x="348" y="106" font-size="11.5" font-weight="550" text-anchor="middle">Direct repair</text>
+              <text class="svg-mint" x="554" y="125" font-size="13.5" font-weight="600">R₁ ✓</text>
+            </g>
+            <g data-t2-ann="r2">
+              <text class="svg-accent svg-text-halo" x="384" y="254" font-size="11.5" font-weight="550" text-anchor="middle">Re-align detour</text>
+              <text class="svg-accent" x="554" y="201" font-size="13.5" font-weight="600">R₂ ✓</text>
+            </g>
+            <g data-t2-ann="r3">
+              <text class="svg-coral svg-text-halo" x="364" y="308" font-size="11.5" font-weight="550" text-anchor="middle">Out-of-gate</text>
+              <text class="svg-coral" x="554" y="327" font-size="13.5" font-weight="600">R₃ ×</text>
+            </g>
+
+            <!-- Concentric anchor reticle s* -->
+            <circle cx="186" cy="210" r="10" fill="none" stroke="var(--diag-amber)" stroke-width="1.3" opacity="0.7"/>
+            <circle cx="186" cy="210" r="4.2" fill="var(--diag-amber)"/>
+            <text class="svg-amber svg-text-halo" x="186" y="236" font-size="13" font-weight="600" text-anchor="middle">s* (t*)</text>
+
+            <!-- Stage budget baseline -->
+            <line class="geo-axis" x1="186" y1="364" x2="524" y2="364"/>
+            <text class="svg-muted" x="186" y="388" font-size="12" text-anchor="middle">0</text>
+            <text class="svg-muted" x="355" y="388" font-size="12" text-anchor="middle">Stage budget</text>
+            <text class="svg-muted" x="524" y="388" font-size="12" text-anchor="middle">T<tspan baseline-shift="sub" font-size="9">stage</tspan></text>
+            <text class="svg-muted" x="355" y="412" font-size="12" text-anchor="middle">Fixed-anchor evaluation</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Act 3: Online Task Rescue -->
+      <div class="proto-act-pair" data-act="2">
+        <article class="proto-act-copy">
+          <span class="proto-act-eyebrow">Track 3</span>
+          <h3>Online task rescue</h3>
+          <p>Run matched initializations with intervention disabled (OFF) or enabled (ON) under a shared total budget. Quantifies both rescued failures (<em>R</em>) and disrupted baseline successes (<em>H</em>).</p>
+          <p class="question">Does intervention help finish the task?</p>
+        </article>
+        <div class="proto-act-visual">
+          <svg class="proto-act-svg" viewBox="0 0 640 420" role="img" aria-label="Track 3 simultaneous Rescue and Harm matched counterfactual trajectories">
+            <text class="svg-muted" x="88" y="34" font-size="13" font-weight="500">Matched counterfactual</text>
+            <text class="svg-muted" x="588" y="34" font-size="13" text-anchor="end">ΔSR = (R − H) / N</text>
+
+            <!-- Shared vertical grid axes -->
+            <line class="geo-axis" x1="88" y1="64" x2="88" y2="348"/>
+            <line class="geo-axis" x1="526" y1="64" x2="526" y2="348"/>
+            <line x1="256" y1="64" x2="256" y2="348" stroke="var(--diag-amber)" stroke-width="1.2" stroke-dasharray="4 4"/>
+            <line x1="360" y1="64" x2="360" y2="348" stroke="var(--line)" stroke-width="1.1" stroke-dasharray="3 4" opacity="0.75"/>
+
+            <text class="svg-muted" x="88" y="54" font-size="11.5" text-anchor="middle">s₀</text>
+            <text class="svg-amber" x="256" y="54" font-size="11.5" font-weight="600" text-anchor="middle">Trigger</text>
+            <text class="svg-muted" x="360" y="54" font-size="11.5" text-anchor="middle">Handoff</text>
+            <text class="svg-muted" x="526" y="54" font-size="11.5" text-anchor="middle">T<tspan baseline-shift="sub" font-size="9">max</tspan></text>
+
+            <!-- Upper Pair: Rescue (R) -->
+            <text class="svg-mint" x="102" y="76" font-size="12" font-weight="600">Rescue (R)</text>
+            <rect x="256" y="130" width="104" height="44" fill="color-mix(in srgb, #5dd8bd 6%, transparent)"/>
+            <line class="geo-grid" x1="88" y1="98" x2="526" y2="98"/>
+            <line class="geo-grid" x1="88" y1="154" x2="526" y2="154"/>
+            <text class="svg-muted" x="68" y="102" font-size="12" font-weight="550" text-anchor="end">OFF</text>
+            <text class="svg-mint" x="68" y="158" font-size="12" font-weight="550" text-anchor="end">ON</text>
+
+            <path class="geo-rail" stroke="var(--diag-coral)" d="M 88 98 H 256 C 318 98, 376 134, 526 134"/>
+            <path class="geo-rail" stroke="var(--diag-mint)" d="M 88 154 H 248 L 256 134 L 264 154 H 526"/>
+            <path class="geo-trace" data-t3-trace="r-off" stroke="var(--diag-coral)" d="M 88 98 H 256 C 318 98, 376 134, 526 134"/>
+            <path class="geo-trace" data-t3-trace="r-on" stroke="var(--diag-mint)" d="M 88 154 H 248 L 256 134 L 264 154 H 526"/>
+            <rect data-t3-cursor="r-off" x="85" y="95" width="6" height="6" fill="var(--diag-coral)"/>
+            <rect data-t3-cursor="r-on" x="85" y="151" width="6" height="6" fill="var(--diag-mint)"/>
+            <text class="svg-coral" x="544" y="138" font-size="12.5" font-weight="600" data-t3-out="r-off">× Fail</text>
+            <text class="svg-mint" x="544" y="158" font-size="12.5" font-weight="600" data-t3-out="r-on">✓ Pass</text>
+
+            <line class="geo-axis" x1="48" y1="194" x2="594" y2="194"/>
+
+            <!-- Lower Pair: Harm (H) -->
+            <text class="svg-coral" x="102" y="216" font-size="12" font-weight="600">Harm (H)</text>
+            <rect x="256" y="270" width="104" height="44" fill="color-mix(in srgb, #ff8e88 6%, transparent)"/>
+            <line class="geo-grid" x1="88" y1="238" x2="526" y2="238"/>
+            <line class="geo-grid" x1="88" y1="294" x2="526" y2="294"/>
+            <text class="svg-muted" x="68" y="242" font-size="12" font-weight="550" text-anchor="end">OFF</text>
+            <text class="svg-coral" x="68" y="298" font-size="12" font-weight="550" text-anchor="end">ON</text>
+
+            <path class="geo-rail" stroke="var(--diag-mint)" d="M 88 238 H 526"/>
+            <path class="geo-rail" stroke="var(--diag-coral)" d="M 88 294 H 248 L 256 274 L 264 298 C 330 314, 396 334, 526 334"/>
+            <path class="geo-trace" data-t3-trace="h-off" stroke="var(--diag-mint)" d="M 88 238 H 526"/>
+            <path class="geo-trace" data-t3-trace="h-on" stroke="var(--diag-coral)" d="M 88 294 H 248 L 256 274 L 264 298 C 330 314, 396 334, 526 334"/>
+            <rect data-t3-cursor="h-off" x="85" y="235" width="6" height="6" fill="var(--diag-mint)"/>
+            <rect data-t3-cursor="h-on" x="85" y="291" width="6" height="6" fill="var(--diag-coral)"/>
+            <text class="svg-mint" x="544" y="242" font-size="12.5" font-weight="600" data-t3-out="h-off">✓ Pass</text>
+            <text class="svg-coral" x="544" y="338" font-size="12.5" font-weight="600" data-t3-out="h-on">× Fail</text>
+
+            <!-- Scroll playhead -->
+            <line data-t3-playhead x1="88" y1="66" x2="88" y2="348" stroke="var(--diag-accent)" stroke-width="1.2" opacity="0.35"/>
+
+            <!-- Bottom 4-outcome legend bar -->
+            <line class="geo-axis" x1="88" y1="364" x2="526" y2="364"/>
+            <text class="svg-coral" x="88" y="392" font-size="12" font-weight="600">×</text>
+            <text class="svg-mint" x="102" y="392" font-size="12" font-weight="600">✓</text>
+            <text x="118" y="392" font-size="12" font-weight="550">Rescue (R)</text>
+
+            <text class="svg-mint" x="220" y="392" font-size="12" font-weight="600">✓</text>
+            <text class="svg-coral" x="234" y="392" font-size="12" font-weight="600">×</text>
+            <text x="250" y="392" font-size="12" font-weight="550">Harm (H)</text>
+
+            <g opacity="0.62">
+              <text class="svg-mint" x="344" y="392" font-size="12">✓ ✓</text>
+              <text class="svg-muted" x="372" y="392" font-size="12">Preserved</text>
+              <text class="svg-coral" x="464" y="392" font-size="12">× ×</text>
+              <text class="svg-muted" x="492" y="392" font-size="12">Unresolved</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div></section>
 <section class="section data" id="data" aria-labelledby="data-title"><div class="wrap">
-<div class="section-heading"><h2 id="data-title">Data generation</h2><p>Source-policy rollouts, reviewed failure anchors, and independently checked corrective continuations.</p></div>
-<div class="data-intro"><h3>Y-paired data</h3><p>A shared execution prefix and failure state connect the original failed continuation with a corrective branch. Each branch retains its own stage and final-task outcomes.</p></div>
-<figure class="paired" aria-label="Y-paired construction: a shared execution prefix reaches a reviewed failure anchor, then branches into the original failed continuation and a corrective continuation. Stage repair and final task completion are checked separately.">
-<svg class="paired-lines" viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true"><path d="M340 180 H420 Q455 180 475 130 L500 90 H565"/><path d="M420 180 Q455 180 475 230 L500 270 H565"/></svg>
-<div class="prefix"><p class="paired-label">Shared prefix</p><h3>Reviewed failure anchor</h3><p>The same execution history and failed physical state.</p></div>
-<div class="branch"><p class="paired-label">Original branch</p><h3>Source-policy continuation</h3><p>Records the original failed execution.</p></div>
-<div class="branch corrective"><p class="paired-label">Corrective branch</p><h3>Recovery continuation</h3><p>Stage repair and final task completion are independently verified.</p></div>
-</figure>
-<div class="data-notes"><div><h3>Collect and review</h3><p>Record policy rollouts and review failure onset, the affected stage, and failure type.</p></div><div><h3>Generate corrections</h3><p>Collect corrective references through automated recovery and human teleoperation.</p></div><div><h3>Verify and split</h3><p>Check stage and task outcomes separately. Keep a source episode and all its variants in one split.</p></div></div>
+<div class="section-heading"><h2 id="data-title">Data generation</h2><p>Policy-generated rollouts, human-reviewed failure onsets, and independently verified corrective branches.</p></div>
+<div class="data-intro"><h3>Y-shaped data</h3><p>12,000 Y-shaped failure–recovery records (3,000 original + 9,000 visual and embodiment variants) pair each unresolved continuation with a verified corrective branch from the same physical failure state.</p></div>
+<div class="data-sticky-track" id="data-sticky-stage" aria-label="REGAIN Y-shaped data construction pipeline">
+  <div class="data-sticky-viewport">
+    <div class="pipe-header">
+      <div class="pipe-header-row">
+        <h3>Y-shaped data construction pipeline</h3>
+        <span class="pipe-counter" data-pipe-counter>01 / 05</span>
+      </div>
+      <div class="pipe-progress-rail" aria-hidden="true"><span class="pipe-progress-fill"></span></div>
+    </div>
+    <div class="pipe-svg-wrap">
+      <svg class="pipe-svg" viewBox="0 0 1120 236" role="img" aria-label="Scroll-driven Y-shaped data construction pipeline diagram">
+        <!-- Stage 1: Rollout -->
+        <g transform="translate(4,20)">
+          <rect class="pipe-node is-active-stage" data-pipe-box="0" x="0" y="0" width="176" height="192" rx="10"/>
+          <text class="svg-accent" x="16" y="26" font-size="11.5" font-weight="550">01</text>
+          <text x="16" y="46" font-size="14.5" font-weight="550">Source Rollout</text>
+
+          <text class="svg-muted" x="16" y="72" font-size="10.5">RoboTwin</text>
+          <text class="svg-accent" x="160" y="72" font-size="10.5" text-anchor="end">60%</text>
+          <line class="geo-grid" x1="16" y1="78" x2="160" y2="78"/>
+          <line data-pipe-bar="0" x1="16" y1="78" x2="103" y2="78" stroke="var(--diag-accent)" stroke-width="2.2" stroke-linecap="round"/>
+
+          <text class="svg-muted" x="16" y="98" font-size="10.5">ManiSkill</text>
+          <text class="svg-accent" x="160" y="98" font-size="10.5" text-anchor="end">30%</text>
+          <line class="geo-grid" x1="16" y1="104" x2="160" y2="104"/>
+          <line data-pipe-bar="1" x1="16" y1="104" x2="59" y2="104" stroke="var(--diag-accent)" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
+
+          <text class="svg-muted" x="16" y="124" font-size="10.5">RoboLab</text>
+          <text class="svg-accent" x="160" y="124" font-size="10.5" text-anchor="end">10%</text>
+          <line class="geo-grid" x1="16" y1="130" x2="160" y2="130"/>
+          <line data-pipe-bar="2" x1="16" y1="130" x2="31" y2="130" stroke="var(--diag-accent)" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+
+          <text class="svg-muted" x="16" y="172" font-size="11.5">33 tasks · 8 source RFMs</text>
+        </g>
+
+        <!-- Stage 2: Review -->
+        <g transform="translate(212,20)">
+          <rect class="pipe-node" data-pipe-box="1" x="0" y="0" width="176" height="192" rx="10"/>
+          <text class="svg-amber" x="16" y="26" font-size="11.5" font-weight="550">02</text>
+          <text x="16" y="46" font-size="14.5" font-weight="550">Onset Review</text>
+          <line class="geo-axis" x1="16" y1="96" x2="160" y2="96"/>
+          <line x1="28" y1="90" x2="28" y2="102" stroke="var(--diag-mint)" stroke-width="1.6"/>
+          <line x1="62" y1="90" x2="62" y2="102" stroke="var(--diag-mint)" stroke-width="1.6"/>
+          <line x1="102" y1="84" x2="102" y2="108" stroke="var(--diag-amber)" stroke-width="2"/>
+          <line x1="148" y1="90" x2="148" y2="102" stroke="var(--line)" stroke-width="1.4"/>
+          <text class="svg-muted" x="28" y="119" font-size="9.5" text-anchor="middle">t₀</text>
+          <text class="svg-amber" x="102" y="76" font-size="11" font-weight="600" text-anchor="middle">t*</text>
+          <text class="svg-muted" x="148" y="119" font-size="9.5" text-anchor="middle">T</text>
+          <line data-pipe-scanner x1="28" y1="78" x2="28" y2="114" stroke="var(--diag-amber)" stroke-width="1.6"/>
+          <text class="svg-muted" x="16" y="154" font-size="11.5">11 failure types</text>
+          <text class="svg-muted" x="16" y="172" font-size="11.5">2-pass lead review</text>
+        </g>
+
+        <!-- Y-shaped Data bracket -->
+        <rect x="412" y="8" width="484" height="218" rx="12" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 4"/>
+        <text class="svg-accent" x="426" y="25" font-size="11" font-weight="550">Y-shaped records</text>
+
+        <!-- Stage 3: Prefix & Anchor Replay -->
+        <g transform="translate(422,35)">
+          <rect class="pipe-node" data-pipe-box="2" x="0" y="0" width="168" height="176" rx="10"/>
+          <text class="svg-amber" x="16" y="25" font-size="11.5" font-weight="550">03</text>
+          <text x="16" y="45" font-size="14.5" font-weight="550">Replay Anchor</text>
+          <line class="geo-axis" x1="16" y1="86" x2="152" y2="86"/>
+          <path class="geo-rail" stroke="var(--diag-amber)" d="M 136 82 C 132 58, 98 58, 94 78"/>
+          <path id="pipe-trace-rewind" class="geo-trace" stroke="var(--diag-amber)" d="M 136 82 C 132 58, 98 58, 94 78"/>
+          <circle cx="94" cy="86" r="7.5" fill="none" stroke="var(--diag-amber)" stroke-width="1.3"/>
+          <circle cx="94" cy="86" r="3" fill="var(--diag-amber)"/>
+          <text class="svg-amber" x="94" y="112" font-size="11.5" font-weight="600" text-anchor="middle">s*</text>
+          <text class="svg-muted" x="16" y="144" font-size="11.5">Deterministic state</text>
+          <text class="svg-muted" x="16" y="160" font-size="11.5">reconstruction</text>
+        </g>
+
+        <!-- Stage 4: Y-Fork Branches -->
+        <g transform="translate(658,35)">
+          <rect class="pipe-node" data-pipe-box="3" x="0" y="0" width="224" height="79" rx="10"/>
+          <text class="svg-coral" x="16" y="25" font-size="12.5" font-weight="600">04a · Source continuation</text>
+          <text class="svg-muted" x="16" y="46" font-size="11.5">Original policy</text>
+          <text class="svg-coral" x="16" y="64" font-size="11">× unresolved failure</text>
+
+          <rect class="pipe-node" data-pipe-box="3b" x="0" y="97" width="224" height="79" rx="10"/>
+          <text class="svg-mint" x="16" y="122" font-size="12.5" font-weight="600">04b · Corrective continuation</text>
+          <text class="svg-muted" x="16" y="143" font-size="11.5">State machine &amp; teleop</text>
+          <text class="svg-mint" x="16" y="161" font-size="11">✓ stage · ✓ task check</text>
+        </g>
+
+        <!-- Stage 5: Augmentation Fan-out -->
+        <g transform="translate(920,20)">
+          <rect class="pipe-node" data-pipe-box="4" x="0" y="0" width="194" height="192" rx="10"/>
+          <text class="svg-accent" x="18" y="26" font-size="11.5" font-weight="550">05</text>
+          <text x="18" y="46" font-size="14.5" font-weight="550">Augmentation</text>
+          <text class="svg-accent" x="18" y="102" font-size="11.5" font-weight="550">Clean</text>
+          <text class="svg-muted" x="18" y="118" font-size="11">3,000</text>
+          <path class="geo-rail" stroke="var(--diag-accent)" d="M 56 99 C 78 99, 82 72, 108 72"/>
+          <path class="geo-rail" stroke="var(--diag-amber)" d="M 56 99 H 108"/>
+          <path class="geo-rail" stroke="var(--diag-mint)" d="M 56 99 C 78 99, 82 126, 108 126"/>
+          <path id="pipe-trace-aug1" class="geo-trace" stroke="var(--diag-accent)" d="M 56 99 C 78 99, 82 72, 108 72"/>
+          <path id="pipe-trace-aug2" class="geo-trace" stroke="var(--diag-amber)" d="M 56 99 H 108"/>
+          <path id="pipe-trace-aug3" class="geo-trace" stroke="var(--diag-mint)" d="M 56 99 C 78 99, 82 126, 108 126"/>
+          <text class="svg-accent" x="114" y="76" font-size="11" font-weight="550">Bg · 6,000</text>
+          <text class="svg-amber" x="114" y="103" font-size="11" font-weight="550">Emb · 1,000</text>
+          <text class="svg-mint" x="114" y="130" font-size="11" font-weight="550">Mix · 2,000</text>
+          <text class="svg-muted" x="18" y="172" font-size="11.5">12,000 total records</text>
+        </g>
+
+        <!-- Clean inter-stage connectors (zero box crossings) -->
+        <path class="geo-rail" stroke="var(--diag-accent)" d="M 180 116 H 212"/>
+        <path class="geo-rail" stroke="var(--diag-accent)" d="M 388 116 H 422"/>
+        <path class="geo-rail" stroke="var(--diag-amber)" d="M 590 121 H 604"/>
+        <path class="geo-rail" stroke="var(--diag-coral)" d="M 604 121 C 630 121, 632 74, 658 74"/>
+        <path class="geo-rail" stroke="var(--diag-mint)" d="M 604 121 C 630 121, 632 171, 658 171"/>
+        <path class="geo-rail" stroke="var(--diag-accent)" d="M 882 121 H 920"/>
+
+        <path id="pipe-trace-12" class="geo-trace" stroke="var(--diag-accent)" d="M 180 116 H 212"/>
+        <path id="pipe-trace-23" class="geo-trace" stroke="var(--diag-accent)" d="M 388 116 H 422"/>
+        <path id="pipe-trace-3y" class="geo-trace" stroke="var(--diag-amber)" d="M 590 121 H 604"/>
+        <path id="pipe-trace-orig" class="geo-trace" stroke="var(--diag-coral)" d="M 604 121 C 630 121, 632 74, 658 74"/>
+        <path id="pipe-trace-corr" class="geo-trace" stroke="var(--diag-mint)" d="M 604 121 C 630 121, 632 171, 658 171"/>
+        <path id="pipe-trace-out" class="geo-trace" stroke="var(--diag-accent)" d="M 882 121 H 920"/>
+
+        <!-- Y-junction anchor reticle -->
+        <circle cx="604" cy="121" r="7" fill="none" stroke="var(--diag-amber)" stroke-width="1.3"/>
+        <circle cx="604" cy="121" r="2.8" fill="var(--diag-amber)"/>
+      </svg>
+    </div>
+    <div class="pipe-stage-strip">
+      <div class="pipe-step is-active" data-pipe-step="0">
+        <span class="pipe-step-num">01</span>
+        <strong>Source rollout</strong>
+        <span>Collect failures across 33 sim tasks &amp; 8 source RFMs.</span>
+      </div>
+      <div class="pipe-step" data-pipe-step="1">
+        <span class="pipe-step-num">02</span>
+        <strong>Onset review</strong>
+        <span>Annotate failure onset <em>t</em>* &amp; 11 failure types with lead review.</span>
+      </div>
+      <div class="pipe-step" data-pipe-step="2">
+        <span class="pipe-step-num">03</span>
+        <strong>Replay anchor</strong>
+        <span>Rewind and deterministically reconstruct physical state <em>s</em>*.</span>
+      </div>
+      <div class="pipe-step" data-pipe-step="3">
+        <span class="pipe-step-num">04</span>
+        <strong>Y-shaped fork</strong>
+        <span>Pair unresolved continuation with verified stage &amp; task recovery.</span>
+      </div>
+      <div class="pipe-step" data-pipe-step="4">
+        <span class="pipe-step-num">05</span>
+        <strong>Augmentation</strong>
+        <span>Expand 3,000 clean pairs with 9,000 visual &amp; embodiment variants.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="data-composition">
+  <div class="comp-card">
+    <div class="comp-head"><h3>Failure-type distribution</h3><span>12,000 failure–recovery pairs</span></div>
+    <ul class="bar-list" aria-label="Failure-type counts across 12,000 records">
+      <li><div class="bar-row-meta"><span class="bar-name">Spatial misalignment</span><span class="bar-val">4,029 (33.6%)</span></div><div class="bar-track"><span class="bar-fill" style="width:100%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Repeated stage / no progress</span><span class="bar-val">3,051 (25.4%)</span></div><div class="bar-track"><span class="bar-fill" style="width:75.7%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Unstable grasp / slipping</span><span class="bar-val">1,713 (14.3%)</span></div><div class="bar-track"><span class="bar-fill" style="width:42.5%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Gripper timing / opening</span><span class="bar-val">918 (7.7%)</span></div><div class="bar-track"><span class="bar-fill" style="width:22.8%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Insufficient motion extent</span><span class="bar-val">801 (6.7%)</span></div><div class="bar-track"><span class="bar-fill" style="width:19.9%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Path error / collision</span><span class="bar-val">477 (4.0%)</span></div><div class="bar-track"><span class="bar-fill" style="width:11.8%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Wrong object / target</span><span class="bar-val">411 (3.4%)</span></div><div class="bar-track"><span class="bar-fill" style="width:10.2%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Orientation error</span><span class="bar-val">384 (3.2%)</span></div><div class="bar-track"><span class="bar-fill" style="width:9.5%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Excessive motion extent</span><span class="bar-val">99 (0.8%)</span></div><div class="bar-track"><span class="bar-fill" style="width:2.5%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Bimanual coordination</span><span class="bar-val">75 (0.6%)</span></div><div class="bar-track"><span class="bar-fill" style="width:1.9%"></span></div></li>
+      <li><div class="bar-row-meta"><span class="bar-name">Subtask order / omission</span><span class="bar-val">42 (0.3%)</span></div><div class="bar-track"><span class="bar-fill" style="width:1.0%"></span></div></li>
+    </ul>
+  </div>
+  <div class="comp-card">
+    <div class="comp-head"><h3>Platforms &amp; source RFMs</h3><span>33 distinct tasks · 8 source policies</span></div>
+    <div class="comp-subblock">
+      <h4>Platform breakdown</h4>
+      <ul class="bar-list bar-list-compact">
+        <li><div class="bar-row-meta"><span class="bar-name">RoboTwin (19 tasks)</span><span class="bar-val">7,236 (60.3%)</span></div><div class="bar-track"><span class="bar-fill is-accent" style="width:60.3%"></span></div></li>
+        <li><div class="bar-row-meta"><span class="bar-name">ManiSkill (9 tasks)</span><span class="bar-val">3,579 (29.8%)</span></div><div class="bar-track"><span class="bar-fill is-accent" style="width:29.8%"></span></div></li>
+        <li><div class="bar-row-meta"><span class="bar-name">RoboLab (5 tasks)</span><span class="bar-val">1,185 (9.9%)</span></div><div class="bar-track"><span class="bar-fill is-accent" style="width:9.9%"></span></div></li>
+      </ul>
+    </div>
+    <div class="comp-subblock">
+      <h4>Source-model families</h4>
+      <div class="family-split" role="img" aria-label="Source-model family shares: VLA 50.4%, WAM 26.4%, RDT 23.2%">
+        <span class="seg-vla" style="width:50.425%">VLA 50.4%</span>
+        <span class="seg-wam" style="width:26.35%">WAM 26.4%</span>
+        <span class="seg-rdt" style="width:23.225%">RDT 23.2%</span>
+      </div>
+      <dl class="rfm-grid">
+        <div><dt>π<sub>0</sub>-FAST (VLA)</dt><dd>2,583 · 21.5%</dd></div>
+        <div><dt>π<sub>0.5</sub> (VLA)</dt><dd>2,106 · 17.6%</dd></div>
+        <div><dt>RDT (RDT)</dt><dd>2,061 · 17.2%</dd></div>
+        <div><dt>FastWAM (WAM)</dt><dd>1,470 · 12.3%</dd></div>
+        <div><dt>X-VLA (VLA)</dt><dd>1,362 · 11.4%</dd></div>
+        <div><dt>LingBot-VA (WAM)</dt><dd>1,350 · 11.3%</dd></div>
+        <div><dt>H-RDT (RDT)</dt><dd>726 · 6.1%</dd></div>
+        <div><dt>Cosmos3-Edge (WAM)</dt><dd>342 · 2.9%</dd></div>
+      </dl>
+    </div>
+    <p class="comp-footnote">Inventory: 3,000 original pairs, 6,000 background variants, 1,000 embodiment variants, and 2,000 combined variants.</p>
+  </div>
+</div>
+
+<div class="benchmark-compare">
+  <div class="comp-head"><h3>Comparison of failure-handling benchmarks</h3><span>Public data or evaluation protocols</span></div>
+  <div class="table-wrap">
+    <table>
+      <caption>Comparison of failure-handling benchmarks across coverage, data, and evaluation protocols</caption>
+      <thead>
+        <tr>
+          <th scope="col">Benchmark</th>
+          <th scope="col"># Sim.</th>
+          <th scope="col">Arms</th>
+          <th scope="col">Multi-RFM</th>
+          <th scope="col">Policy fails</th>
+          <th scope="col">Onset labels</th>
+          <th scope="col">Recovery trajs</th>
+          <th scope="col">Streaming detection</th>
+          <th scope="col">Stage recovery</th>
+          <th scope="col">Task comp.</th>
+          <th scope="col">Online interv.</th>
+          <th scope="col">Real-robot</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">LIBERO-RECOVER</th><td>1</td><td>S</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td><td>3,184</td><td class="mark-no">✗</td><td class="mark-no">✗</td><td class="mark-yes">✓</td><td class="mark-no">✗</td><td class="mark-no">✗</td></tr>
+        <tr><th scope="row">RoboRecover</th><td>2</td><td>S+B</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td><td class="mark-no">✗</td><td>—</td><td class="mark-no">✗†</td><td class="mark-no">✗</td><td class="mark-yes">✓</td><td class="mark-no">✗†</td><td class="mark-no">✗</td></tr>
+        <tr><th scope="row">FSR-Bench</th><td>1</td><td>B</td><td class="mark-no">✗</td><td class="mark-no">✗</td><td class="mark-no">✗</td><td>—</td><td class="mark-no">✗</td><td class="mark-yes">✓</td><td class="mark-no">✗</td><td class="mark-no">✗</td><td class="mark-no">✗‡</td></tr>
+        <tr><th scope="row">FRBench</th><td>1</td><td>B</td><td class="mark-no">✗</td><td class="mark-no">✗§</td><td class="mark-no">✗</td><td>6,392</td><td class="mark-no">✗</td><td class="mark-no">✗</td><td class="mark-yes">✓</td><td class="mark-no">✗</td><td class="mark-yes">✓</td></tr>
+        <tr><th scope="row">RecoverBench</th><td>1</td><td>S</td><td class="mark-no">✗</td><td class="mark-no">✗</td><td class="mark-no">✗</td><td>10,598</td><td class="mark-no">✗</td><td class="mark-no">✗</td><td class="mark-yes">✓</td><td class="mark-no">✗</td><td class="mark-no">✗</td></tr>
+        <tr class="compare-ours"><th scope="row">REGAIN (Ours)</th><td>3</td><td>S+B</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td><td>12,000</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td><td class="mark-yes">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="comp-footnote">S/B: single-arm/bimanual. —: no verified public count. † Monitoring begins after a supplied recovery point. ‡ CARE's real-robot experiments are separate from FSR-Bench. § Policy failures are used for training; evaluation uses injected failures.</p>
+</div>
 </div></section>
 <section class="section" id="recovery" aria-labelledby="recovery-title"><div class="wrap">
   <div class="section-heading">
     <h2 id="recovery-title">Recovery in practice</h2>
+    <p>Average Stage SR conceals complementary strengths across recovery paradigms and failure demands.</p>
   </div>
   <div class="rrw-layout">
     <figure class="rrw-chart" aria-labelledby="rrw-chart-title">
       <div class="rrw-panel-heading">
-        <h3 id="rrw-chart-title">Recovery capabilities</h3>
-        <p>Simulation recovery · Illustrative comparison</p>
+        <h3 id="rrw-chart-title">Recovery by required capability</h3>
+        <p>Task-macro Stage SR (%) · 750 common cases (500 parents, 33 tasks) · Radial scale 0–40%</p>
       </div>
-      <div class="rrw-methods" role="group" aria-label="Compare illustrative recovery methods">
-        <span class="rrw-fixed rrw-baseline"><span class="rrw-swatch" aria-hidden="true"></span>Baseline</span>
-        <button type="button" class="rrw-method-a" data-method="a" aria-pressed="true"><span class="rrw-swatch" aria-hidden="true"></span>Method A</button>
-        <button type="button" class="rrw-method-b" data-method="b" aria-pressed="false"><span class="rrw-swatch" aria-hidden="true"></span>Method B</button>
+      <div class="rrw-methods" role="group" aria-label="Compare recovery methods across seven capabilities">
+        <span class="rrw-fixed rrw-baseline"><span class="rrw-swatch" aria-hidden="true"></span>Source cont.</span>
+        <button type="button" class="rrw-method-astra" data-method="astra" aria-pressed="true"><span class="rrw-swatch" aria-hidden="true"></span>Astra</button>
+        <button type="button" class="rrw-method-failsafe" data-method="failsafe" aria-pressed="true"><span class="rrw-swatch" aria-hidden="true"></span>FailSafe</button>
+        <button type="button" class="rrw-method-sft" data-method="sft" aria-pressed="false"><span class="rrw-swatch" aria-hidden="true"></span>Recovery-SFT</button>
+        <button type="button" class="rrw-method-retract" data-method="retract" aria-pressed="false"><span class="rrw-swatch" aria-hidden="true"></span>Retract-and-Retry</button>
+        <button type="button" class="rrw-method-agentchord" data-method="agentchord" aria-pressed="false"><span class="rrw-swatch" aria-hidden="true"></span>AgentChord</button>
+        <button type="button" class="rrw-method-phoenix" data-method="phoenix" aria-pressed="false"><span class="rrw-swatch" aria-hidden="true"></span>Phoenix</button>
       </div>
       <div class="rrw-radar">
         <svg class="rrw-svg" role="img" aria-labelledby="rrw-svg-title rrw-svg-desc">
-          <title id="rrw-svg-title">Simulation recovery capabilities</title>
-          <desc id="rrw-svg-desc">A seven-axis radar with a fixed illustrative baseline and optional method profiles. The scale runs from 0 to 100 percent. Select an axis to read its values.</desc>
+          <title id="rrw-svg-title">Stage recovery by annotated capability requirement</title>
+          <desc id="rrw-svg-desc">A seven-axis radar chart plotting Task-macro Stage SR from 0 to 40 percent across seven overlapping capability requirements on 750 common cases. Select an axis to inspect values.</desc>
           <g class="rrw-geometry" aria-hidden="true"></g>
         </svg>
-        <div class="rrw-axis-labels" role="group" aria-label="Recovery capabilities">
-          <button type="button" aria-controls="rrw-rollout-preview" aria-expanded="false" aria-haspopup="dialog" data-axis="0" aria-pressed="true">Bimanual<br>coordination</button>
-          <button type="button" aria-controls="rrw-rollout-preview" aria-expanded="false" aria-haspopup="dialog" data-axis="1" aria-pressed="false">Precision</button>
-          <button type="button" aria-controls="rrw-rollout-preview" aria-expanded="false" aria-haspopup="dialog" data-axis="2" aria-pressed="false">Disturbed<br>objects</button>
-          <button type="button" aria-controls="rrw-rollout-preview" aria-expanded="false" aria-haspopup="dialog" data-axis="3" aria-pressed="false">Motion<br>extent</button>
-          <button type="button" aria-controls="rrw-rollout-preview" aria-expanded="false" aria-haspopup="dialog" data-axis="4" aria-pressed="false">Timely<br>recovery</button>
-          <button type="button" aria-controls="rrw-rollout-preview" aria-expanded="false" aria-haspopup="dialog" data-axis="5" aria-pressed="false">Reorientation</button>
-          <button type="button" aria-controls="rrw-rollout-preview" aria-expanded="false" aria-haspopup="dialog" data-axis="6" aria-pressed="false">Semantic<br>understanding</button>
+        <div class="rrw-axis-labels" role="group" aria-label="Recovery capability axes">
+          <button type="button" aria-controls="rrw-rollout-preview" data-axis="0" aria-pressed="true">Reorientation</button>
+          <button type="button" aria-controls="rrw-rollout-preview" data-axis="1" aria-pressed="false">Precision<br>manipulation</button>
+          <button type="button" aria-controls="rrw-rollout-preview" data-axis="2" aria-pressed="false">Large-range<br>motion</button>
+          <button type="button" aria-controls="rrw-rollout-preview" data-axis="3" aria-pressed="false">Disturbed-object<br>handling</button>
+          <button type="button" aria-controls="rrw-rollout-preview" data-axis="4" aria-pressed="false">Semantic<br>judgment</button>
+          <button type="button" aria-controls="rrw-rollout-preview" data-axis="5" aria-pressed="false">Bimanual<br>coordination</button>
+          <button type="button" aria-controls="rrw-rollout-preview" data-axis="6" aria-pressed="false">Time-sensitive<br>cases</button>
         </div>
       </div>
       <div class="rrw-chart-footer">
         <div class="rrw-values" aria-live="polite">
-          <strong data-selected-axis>Bimanual coordination</strong>
-          <span class="rrw-value rrw-baseline" data-value="baseline">Baseline <b>48%</b></span>
-          <span class="rrw-value rrw-method-a" data-value="a">Method A <b>66%</b></span>
-          <span class="rrw-value rrw-method-b" data-value="b" hidden>Method B <b>52%</b></span>
+          <strong data-selected-axis>Reorientation</strong>
+          <span class="rrw-axis-count" data-axis-count>(n = 310 parents)</span>
+          <span class="rrw-value rrw-baseline" data-value="baseline">Source cont. <b>14.6%</b></span>
+          <span class="rrw-value rrw-method-astra" data-value="astra">Astra <b>34.7%</b></span>
+          <span class="rrw-value rrw-method-failsafe" data-value="failsafe">FailSafe <b>17.5%</b></span>
+          <span class="rrw-value rrw-method-sft" data-value="sft" hidden>Recovery-SFT <b>9.5%</b></span>
+          <span class="rrw-value rrw-method-retract" data-value="retract" hidden>Retract-and-Retry <b>11.8%</b></span>
+          <span class="rrw-value rrw-method-agentchord" data-value="agentchord" hidden>AgentChord <b>9.8%</b></span>
+          <span class="rrw-value rrw-method-phoenix" data-value="phoenix" hidden>Phoenix <b>3.3%</b></span>
         </div>
-        <div class="rrw-footer-note"><p class="rrw-data-note">Illustrative profiles · Measured results pending</p><p class="rrw-rollout-hint">Hover a type for real rollout</p></div>
+        <p class="rrw-axis-note" data-axis-note hidden>Time-sensitive Astra: 0.0% under real physical time (23.3% with paused-physics reasoning).</p>
+        <div class="rrw-footer-note"><p class="rrw-data-note">Overlapping capability groups · Fixed-anchor paused-physics protocol</p><p class="rrw-rollout-hint">Select a capability axis to switch paired simulation rollouts</p></div>
+      </div>
+      <div class="rrw-coverage" aria-label="750-case complementarity coverage across seven methods">
+        <div class="rrw-cov-head"><span>750-case single-attempt union</span><span>383 / 750 recovered (51.1%) vs. 248 / 750 Astra (33.1%)</span></div>
+        <div class="rrw-cov-bar" role="img" aria-label="102 Astra only, 146 Shared, 135 Others only, 367 Unsolved">
+          <span class="cov-astra" style="width:13.6%">102</span>
+          <span class="cov-shared" style="width:19.47%">146</span>
+          <span class="cov-others" style="width:18%">135</span>
+          <span class="cov-none" style="width:48.93%">367</span>
+        </div>
+        <ul class="rrw-cov-legend">
+          <li><i class="cov-swatch cov-astra"></i>Astra only: 102 (13.6%)</li>
+          <li><i class="cov-swatch cov-shared"></i>Shared: 146 (19.5%)</li>
+          <li><i class="cov-swatch cov-others"></i>Others only: 135 (18.0%)</li>
+          <li><i class="cov-swatch cov-none"></i>Unsolved by all 7: 367 (48.9%)</li>
+        </ul>
       </div>
     </figure>
-    <aside class="rrw-demo-popover" id="rrw-rollout-preview" role="dialog" aria-label="Real rollout preview" hidden>
-      <div class="rrw-popover-heading"><span>Real rollout</span><strong data-demo-axis>Bimanual coordination</strong></div>
-      <div class="rrw-placeholder" data-demo-preview>
-        <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="Recovery demonstration" hidden></video>
-        <div class="rrw-demo-empty" aria-live="polite">
-        <svg class="rrw-frame-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
-          <rect x="3.5" y="7.5" width="25" height="17" rx="3"/>
-          <path d="M3.5 12h25M9.5 7.5v4.5m7-4.5v4.5m7-4.5v4.5"/>
-        </svg>
-        <span data-demo-status>Demo footage pending</span>
-        </div>
+    <aside class="rrw-demo-popover is-visible" id="rrw-rollout-preview" role="region" aria-label="Reorientation paired simulation rollouts">
+      <div class="rrw-demo-column rrw-original"><div class="rrw-popover-heading"><span>Original</span><span class="rrw-demo-cap" data-demo-cap>Reorientation</span></div>
+        <figure class="rrw-demo-case"><figcaption>ManiSkill</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="maniskill" data-trajectory="original">
+          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="ManiSkill original rollout" hidden></video>
+          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
+        </div></figure>
+        <figure class="rrw-demo-case"><figcaption>RoboTwin</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="robotwin" data-trajectory="original">
+          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="RoboTwin original rollout" hidden></video>
+          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
+        </div></figure>
+        <figure class="rrw-demo-case"><figcaption>RoboLab</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="robolab" data-trajectory="original">
+          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="RoboLab original rollout" hidden></video>
+          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
+        </div></figure>
       </div>
-      <div class="rrw-trajectories" role="group" aria-label="Trajectory view">
-        <button type="button" data-trajectory="original" aria-pressed="true" aria-label="Original rollout">Original</button>
-        <button type="button" data-trajectory="corrective" aria-pressed="false" aria-label="Corrective rollout">Corrective</button>
+      <div class="rrw-demo-column rrw-corrective"><div class="rrw-popover-heading"><span>Corrective</span><span class="rrw-demo-cap" data-demo-cap>Reorientation</span></div>
+        <figure class="rrw-demo-case"><figcaption>ManiSkill</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="maniskill" data-trajectory="corrective">
+          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="ManiSkill corrective rollout" hidden></video>
+          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
+        </div></figure>
+        <figure class="rrw-demo-case"><figcaption>RoboTwin</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="robotwin" data-trajectory="corrective">
+          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="RoboTwin corrective rollout" hidden></video>
+          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
+        </div></figure>
+        <figure class="rrw-demo-case"><figcaption>RoboLab</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="robolab" data-trajectory="corrective">
+          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="RoboLab corrective rollout" hidden></video>
+          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
+        </div></figure>
       </div>
     </aside>
   </div>
 </div></section>
 <section class="section" id="leaderboard" aria-labelledby="leaderboard-title"><div class="wrap">
-<div class="section-heading"><h2 id="leaderboard-title">Leaderboard</h2></div>
+<div class="section-heading"><h2 id="leaderboard-title">Leaderboard</h2><p>Measured results across streaming detection, fixed-anchor stage recovery, and matched online task rescue.</p></div>
 <div class="tabs" role="tablist" aria-label="Benchmark tracks"><span class="tab-indicator" aria-hidden="true"></span><button id="tab-detection" aria-label="Track 1 · Detection" role="tab" aria-selected="true" aria-controls="board-detection" tabindex="0"><span class="tab-track">Track 1 · </span>Detection</button><button id="tab-recovery" aria-label="Track 2 · Recovery" role="tab" aria-selected="false" aria-controls="board-recovery" tabindex="-1"><span class="tab-track">Track 2 · </span>Recovery</button><button id="tab-rescue" aria-label="Track 3 · Task rescue" role="tab" aria-selected="false" aria-controls="board-rescue" tabindex="-1"><span class="tab-track">Track 3 · </span>Task rescue</button></div>
 <div class="board-stage">
-<div id="board-detection" role="tabpanel" aria-labelledby="tab-detection" tabindex="0"><div class="board-intro"><h3>Streaming failure detection</h3></div><div class="table-wrap"><table><caption>Track 1 failure detection results</caption><thead><tr><th scope="col">Method</th><th scope="col">bACC ↑</th><th scope="col">bTWAon ↑</th><th scope="col">Latency (ms) ↓</th></tr></thead><tbody><tr class="method-group"><th colspan="4" scope="rowgroup">Lightweight monitors</th></tr>
-<tr><th scope="row">FailureSpot</th><td>66.8</td><td>59.91</td><td>1.08</td></tr>
-<tr><th scope="row">Hide-and-Seek</th><td>70.4</td><td>59.82</td><td>6.31</td></tr>
-<tr><th scope="row">ActProbe</th><td>70.7</td><td>59.78</td><td>1.37</td></tr>
-<tr><th scope="row">SAFE-MLP</th><td>70.0</td><td>58.96</td><td>9.96</td></tr>
-<tr><th scope="row">STAC</th><td>71.4</td><td>58.43</td><td>12729</td></tr>
-<tr><th scope="row">FIPER</th><td>66.9</td><td>58.29</td><td>17255</td></tr>
-<tr><th scope="row">SAFE-LSTM</th><td>62.8</td><td>57.80</td><td>12.90</td></tr>
-<tr><th scope="row">STAC-Single</th><td>60.3</td><td>54.54</td><td>1793</td></tr>
-<tr><th scope="row">LogpZO</th><td>59.5</td><td>54.16</td><td>118</td></tr>
-<tr class="method-group"><th colspan="4" scope="rowgroup">Small-scale VLM monitors</th></tr>
-<tr><th scope="row">LLaVA-OV-7B FailSafe</th><td>81.4</td><td>74.38</td><td>222</td></tr>
-<tr><th scope="row">Qwen3.5-0.8B FailSafe-style</th><td>78.7</td><td>71.00</td><td>114</td></tr>
-<tr><th scope="row">Qwen3.5-4B FailSafe-style</th><td>77.6</td><td>70.66</td><td>167</td></tr>
-<tr><th scope="row">Robo-Dopamine</th><td>75.3</td><td>61.31</td><td>500</td></tr>
-<tr><th scope="row">RoboMeter</th><td>70.0</td><td>55.22</td><td>402</td></tr>
-<tr><th scope="row">Qwen3-VL-4B</th><td>62.1</td><td>48.56</td><td>485</td></tr>
-<tr><th scope="row">Qwen3.5-4B Base</th><td>53.9</td><td>48.42</td><td>417</td></tr>
-<tr><th scope="row">Qwen3.5-0.8B Base</th><td>58.8</td><td>46.62</td><td>472</td></tr>
-<tr class="method-group"><th colspan="4" scope="rowgroup">API monitors</th></tr>
-<tr><th scope="row">GPT 6.1 Sol Sentinel-Style</th><td>85.1</td><td>72.28</td><td>6242</td></tr>
-<tr><th scope="row">DeepSeek V4.1 Flash Sentinel-Style</th><td>80.1</td><td>65.51</td><td>7123</td></tr>
-<tr><th scope="row">Gemini 3.8 Flash Sentinel-Style</th><td>76.2</td><td>65.25</td><td>34496</td></tr>
-<tr><th scope="row">GPT 6.1 Sol FailSafe-style</th><td>54.9</td><td>39.74</td><td>10551</td></tr>
-<tr><th scope="row">Gemini 3.8 Flash FailSafe-style</th><td>50.5</td><td>31.86</td><td>77301</td></tr>
-<tr><th scope="row">DeepSeek V4.1 Flash FailSafe-style</th><td>51.8</td><td>30.88</td><td>6608</td></tr>
+<div id="board-detection" role="tabpanel" aria-labelledby="tab-detection" tabindex="0"><div class="board-intro"><h3>Streaming failure detection</h3></div><div class="table-wrap"><table><caption>Track 1 streaming failure detection results on 1,500 evaluation sequences at tau equals 10 seconds</caption><thead><tr><th scope="col">Monitor</th><th scope="col">TWA<sub>Δ</sub> (%) ↑</th><th scope="col">bACC (%) ↑</th><th scope="col">Recall (%)</th><th scope="col">FPR (%)</th><th scope="col">Latency (ms) ↓</th></tr></thead><tbody>
+<tr class="method-group"><th colspan="6" scope="rowgroup">Lightweight monitors</th></tr>
+<tr><th scope="row">Hide-and-Seek</th><td>57.58</td><td>72.93</td><td>69.60</td><td>23.73</td><td>6.31</td></tr>
+<tr><th scope="row">FailureSpot</th><td>55.49</td><td>66.73</td><td>54.13</td><td>20.67</td><td>1.08</td></tr>
+<tr><th scope="row">ActProbe</th><td>54.58</td><td>70.07</td><td>54.53</td><td>14.40</td><td>1.37</td></tr>
+<tr><th scope="row">SAFE-LSTM</th><td>54.51</td><td>62.13</td><td>33.20</td><td>8.93</td><td>12.91</td></tr>
+<tr><th scope="row">SAFE-MLP</th><td>53.49</td><td>68.67</td><td>46.80</td><td>9.47</td><td>9.96</td></tr>
+<tr><th scope="row">STAC</th><td>53.44</td><td>70.60</td><td>49.60</td><td>8.40</td><td>12728.80</td></tr>
+<tr><th scope="row">FIPER</th><td>50.82</td><td>64.80</td><td>55.73</td><td>26.13</td><td>17255.08</td></tr>
+<tr><th scope="row">STAC-Single</th><td>50.52</td><td>60.00</td><td>36.13</td><td>16.13</td><td>1792.96</td></tr>
+<tr><th scope="row">LogpZO</th><td>40.05</td><td>56.07</td><td>52.53</td><td>40.40</td><td>118.44</td></tr>
+<tr class="method-group"><th colspan="6" scope="rowgroup">Small-scale VLM monitors</th></tr>
+<tr><th scope="row">LLaVA-OV-7B FailSafe</th><td>64.58</td><td>77.80</td><td>94.80</td><td>39.20</td><td>222.20</td></tr>
+<tr><th scope="row">Qwen3.5-0.8B FailSafe†</th><td>63.08</td><td>76.67</td><td>93.87</td><td>40.53</td><td>114.25</td></tr>
+<tr><th scope="row">Qwen3.5-4B FailSafe†</th><td>60.38</td><td>73.93</td><td>94.93</td><td>47.07</td><td>167.00</td></tr>
+<tr><th scope="row">Robo-Dopamine</th><td>53.74</td><td>75.27</td><td>95.07</td><td>44.53</td><td>500.37</td></tr>
+<tr><th scope="row">RoboMeter</th><td>47.14</td><td>70.00</td><td>98.40</td><td>58.40</td><td>402.40</td></tr>
+<tr><th scope="row">Qwen3.5-4B Base</th><td>45.27</td><td>54.73</td><td>51.20</td><td>41.73</td><td>416.82</td></tr>
+<tr><th scope="row">Qwen3.5-0.8B Base</th><td>39.11</td><td>58.20</td><td>78.93</td><td>62.53</td><td>472.35</td></tr>
+<tr><th scope="row">Qwen3-VL-4B</th><td>38.50</td><td>59.87</td><td>82.53</td><td>62.80</td><td>484.95</td></tr>
+<tr class="method-group"><th colspan="6" scope="rowgroup">API monitors · Prefix-style</th></tr>
+<tr><th scope="row">GPT 6.1 Sol (Prefix)</th><td>66.93</td><td>85.33</td><td>80.53</td><td>9.87</td><td>5461.77</td></tr>
+<tr><th scope="row">DeepSeek V4.1 Flash (Prefix)</th><td>59.85</td><td>79.93</td><td>73.87</td><td>14.00</td><td>6318.00</td></tr>
+<tr><th scope="row">Gemini 3.8 Flash (Prefix)</th><td>58.69</td><td>76.87</td><td>98.00</td><td>44.27</td><td>41169.71</td></tr>
+<tr class="method-group"><th colspan="6" scope="rowgroup">API monitors · Window-style</th></tr>
+<tr><th scope="row">GPT 6.1 Sol (Window)</th><td>32.72</td><td>55.13</td><td>99.60</td><td>89.33</td><td>9811.25</td></tr>
+<tr><th scope="row">Gemini 3.8 Flash (Window)</th><td>23.39</td><td>50.40</td><td>100.00</td><td>99.20</td><td>84443.93</td></tr>
+<tr><th scope="row">DeepSeek V4.1 Flash (Window)</th><td>21.94</td><td>51.80</td><td>100.00</td><td>96.40</td><td>5910.33</td></tr>
 </tbody></table></div></div>
-<div id="board-recovery" role="tabpanel" aria-labelledby="tab-recovery" tabindex="0" hidden><div class="board-intro"><h3>State-conditioned stage recovery</h3></div><div class="table-wrap"><table><caption>Track 2 stage recovery results</caption><thead><tr><th scope="col">Method</th><th scope="col">VLA · N</th><th scope="col">VLA · Stage SR ↑</th><th scope="col">RDT · N</th><th scope="col">RDT · Stage SR ↑</th><th scope="col">WAM · N</th><th scope="col">WAM · Stage SR ↑</th><th scope="col">Wall time (s) ↓</th></tr></thead><tbody><tr><th scope="row">Source-policy continuation</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">BGR</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">Recovery-SFT</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">Phoenix</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">Astra</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">VERA + IDM</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<div id="board-recovery" role="tabpanel" aria-labelledby="tab-recovery" tabindex="0" hidden><div class="board-intro"><h3>State-conditioned stage recovery</h3></div><div class="table-wrap"><table><caption>Track 2 state-conditioned stage recovery results on 750 common cases and evaluated subsets</caption><thead><tr><th scope="col">Method</th><th scope="col">Overall Stage SR (%) ↑</th><th scope="col">VLA (N=351)</th><th scope="col">RDT (N=185)</th><th scope="col">WAM (N=214)</th><th scope="col">Success / n</th></tr></thead><tbody>
+<tr class="method-group"><th colspan="6" scope="rowgroup">Common cohort · 750 cases (500 clean, 250 randomized) · 33 platform/tasks</th></tr>
+<tr><th scope="row">Astra</th><td>32.99</td><td>37.89</td><td>29.38</td><td>23.99</td><td>248/750</td></tr>
+<tr><th scope="row">FailSafe (anchor)</th><td>15.46</td><td>16.47</td><td>16.85</td><td>11.80</td><td>121/750</td></tr>
+<tr><th scope="row">Source-policy continuation</th><td>13.14</td><td>14.15</td><td>9.79</td><td>13.63</td><td>100/750</td></tr>
+<tr><th scope="row">Retract-and-Retry</th><td>11.29</td><td>13.30</td><td>5.11</td><td>12.24</td><td>88/750</td></tr>
+<tr><th scope="row">Recovery-SFT</th><td>10.27</td><td>16.95</td><td>3.83</td><td>7.59</td><td>67/750</td></tr>
+<tr><th scope="row">AgentChord</th><td>8.67</td><td>6.58</td><td>14.56</td><td>7.41</td><td>73/750</td></tr>
+<tr><th scope="row">Phoenix</th><td>2.97</td><td>3.69</td><td>3.99</td><td>0.77</td><td>24/750</td></tr>
+<tr class="method-group"><th colspan="6" scope="rowgroup">Evaluated subsets &amp; partial runs · reported separately</th></tr>
+<tr><th scope="row">ReCoVLA (MS subset)</th><td>15.79</td><td>—</td><td>—</td><td>—</td><td>48/279</td></tr>
+<tr><th scope="row">BGR (source critic)</th><td>1.04</td><td>—</td><td>—</td><td>—</td><td>1/78</td></tr>
+<tr><th scope="row">BGR (expert critic)</th><td>0.00</td><td>—</td><td>—</td><td>—</td><td>0/16</td></tr>
+<tr><th scope="row">MiniMax-H3 + IDM (partial)</th><td>—</td><td>—</td><td>—</td><td>—</td><td>1/8</td></tr>
 </tbody></table></div></div>
-<div id="board-rescue" role="tabpanel" aria-labelledby="tab-rescue" tabindex="0" hidden><div class="board-intro"><h3>Online task rescue</h3></div><div class="table-wrap"><table><caption>Track 3 matched online task outcomes</caption><thead><tr><th scope="col">System</th><th scope="col">Source RFM</th><th scope="col">N</th><th scope="col">OFF SR</th><th scope="col">ON SR</th><th scope="col">Rescue</th><th scope="col">Harm</th><th scope="col">ΔSR ↑</th><th scope="col">Wall (s)</th></tr></thead><tbody><tr><th scope="row">BGR</th><td>VLA · π0.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">Spotter (Astra)</th><td>VLA · π0.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">VLA-Corrector</th><td>VLA · π0.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">CARE</th><td>VLA · π0.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">BGR</th><td>RDT</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">Spotter (Astra)</th><td>RDT</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">BGR</th><td>WAM</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">Spotter (Astra)</th><td>WAM</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<div id="board-rescue" role="tabpanel" aria-labelledby="tab-rescue" tabindex="0" hidden><div class="board-intro"><h3>Online task rescue</h3></div><div class="table-wrap"><table><caption>Track 3 matched online task rescue outcomes from the 300-scenario challenge pool</caption><thead><tr><th scope="col">System</th><th scope="col">Source</th><th scope="col">Platform</th><th scope="col">n / N</th><th scope="col">OFF SR</th><th scope="col">ON SR</th><th scope="col">R</th><th scope="col">H</th><th scope="col">ΔSR (pp) ↑</th></tr></thead><tbody>
+<tr><th scope="row">BGR</th><td>VLA</td><td>RoboTwin</td><td>172/172</td><td>63.95</td><td>59.88</td><td>4</td><td>11</td><td>-4.07</td></tr>
+<tr><th scope="row">VLA-Corrector</th><td>VLA</td><td>RoboTwin</td><td>172/172</td><td>62.79</td><td>59.88</td><td>8</td><td>13</td><td>-2.91</td></tr>
+<tr><th scope="row">VLA-Corrector (all-phase)*</th><td>VLA</td><td>RoboTwin</td><td>169/172*</td><td>66.27</td><td>60.36</td><td>4</td><td>14</td><td>-5.92</td></tr>
+<tr><th scope="row">VLA-Corrector</th><td>VLA</td><td>ManiSkill</td><td>82/82</td><td>35.37</td><td>40.24</td><td>5</td><td>1</td><td>+4.88</td></tr>
+<tr><th scope="row">CARE (2 tasks)</th><td>VLA</td><td>ManiSkill</td><td>19/19</td><td>15.79</td><td>21.05</td><td>1</td><td>0</td><td>+5.26</td></tr>
+<tr><th scope="row">CycleVLA (4 tasks)</th><td>VLA</td><td>ManiSkill</td><td>36/36</td><td>25.00</td><td>11.11</td><td>1</td><td>6</td><td>-13.89</td></tr>
+<tr><th scope="row">ReCoVLA</th><td>VLA</td><td>ManiSkill</td><td>82/82</td><td>42.68</td><td>37.80</td><td>0</td><td>4</td><td>-4.88</td></tr>
+<tr><th scope="row">Astra</th><td>VLA</td><td>RoboTwin</td><td>172/172</td><td>56.98</td><td>59.30</td><td>8</td><td>4</td><td>+2.33</td></tr>
+<tr><th scope="row">Astra</th><td>RDT</td><td>RoboTwin</td><td>172/172</td><td>27.91</td><td>30.81</td><td>5</td><td>0</td><td>+2.91</td></tr>
+<tr><th scope="row">Astra</th><td>WAM</td><td>RoboTwin</td><td>172/172</td><td>76.74</td><td>76.74</td><td>0</td><td>0</td><td>+0.00</td></tr>
 </tbody></table></div></div>
 </div></div></section>
 <section class="section research" id="research" aria-labelledby="research-title"><div class="wrap">
-<div class="section-heading"><h2 id="research-title">Research Q&amp;A</h2><p>Three questions connect the benchmark tracks to the paper’s analyses.</p></div>
-<article class="qa"><span class="qa-number" aria-hidden="true">01</span><h3>How accurate and timely are failure detectors?</h3><div><p>Detection correctness and alarm timing describe different behaviors. We examine both, together with visual-shift robustness, transfer across domains and source models, and query latency.</p><span class="pending">Final analysis pending</span></div></article>
-<article class="qa"><span class="qa-number" aria-hidden="true">02</span><h3>Which failure types can recovery methods repair?</h3><div><p>Category-wise stage recovery reveals which failures each method can address. Matched cases identify shared successes, additional recoveries, and failures unresolved by the evaluated methods.</p><span class="pending">Recovery measurements pending</span></div></article>
-<article class="qa"><span class="qa-number" aria-hidden="true">03</span><h3>When does local recovery improve final task outcomes?</h3><div><p>Independent stage checks and execution traces connect local repair to later task completion. Paired OFF/ON outcomes distinguish rescues, preserved successes, harms, and unresolved failures.</p><span class="pending">Online outcome analysis pending</span></div></article>
+<div class="section-heading"><h2 id="research-title">Research Q&amp;A</h2><p>Four empirical findings connect failure detection, local repair, takeover timing, and final task completion.</p></div>
+<article class="qa"><span class="qa-number" aria-hidden="true">01</span><h3>Do high-accuracy monitors actually detect failures on time?</h3><div><p class="qa-takeaway">Finding: Episode accuracy hides late alarms, protocol blow-ups, and visual-shift drops.</p><p>On 1,500 sequences, <strong>STAC</strong> reaches <strong>70.60% bACC</strong> but falls to <strong>53.44% TWA<sub>Δ</sub></strong> due to delayed triggers. Prompting protocol also dominates API monitors (<strong>GPT 6.1 Sol</strong> FPR jumps from <strong>9.87%</strong> prefix to <strong>89.33%</strong> window), while FailSafe VLMs drop <strong>7.49–16.97</strong> points under background randomization.</p></div></article>
+<article class="qa"><span class="qa-number" aria-hidden="true">02</span><h3>Which capabilities separate recovery paradigms?</h3><div><p class="qa-takeaway">Finding: No single recoverer dominates every capability—paradigms are strongly complementary.</p><p><strong>Astra</strong> leads overall at <strong>32.99%</strong> Stage SR (<strong>+17.53</strong> over FailSafe), yet the 7 methods jointly cover <strong>383/750 (51.1%)</strong> with <strong>135 cases</strong> solved only by non-Astra methods. <strong>FailSafe (28.5%)</strong> and <strong>Recovery-SFT (25.4%)</strong> surpass Astra on bimanual coordination, while <strong>367 cases</strong> remain unsolved by all seven.</p></div></article>
+<article class="qa"><span class="qa-number" aria-hidden="true">03</span><h3>Does earlier intervention uniformly improve stage recovery?</h3><div><p class="qa-takeaway">Finding: Takeover-time curves are non-monotonic—earlier triggers do not guarantee better recovery.</p><p>Shifting intervention across <strong>−1.0 to +3.0 s</strong> around reviewed onset on fixed source trajectories yields no monotonic gain for either <strong>Astra</strong> or <strong>SFT-6k</strong> across 33 ManiSkill parents (99 attempts per offset).</p>
+<div class="qa-visual" aria-label="Controlled takeover offsets on 33 ManiSkill parents (99 attempts per offset)">
+  <div class="qa-vis-title">Same 33 ManiSkill parents · 3 trials per offset (successes / 99 attempts)</div>
+  <div class="offset-grid">
+    <div class="offset-cell"><span class="offset-t">−1.0 s</span><span class="offset-val"><b>Astra</b> 6/99</span><span class="offset-val is-alt"><b>SFT-6k</b> 6/99</span></div>
+    <div class="offset-cell"><span class="offset-t">−0.5 s</span><span class="offset-val"><b>Astra</b> 4/99</span><span class="offset-val is-alt"><b>SFT-6k</b> 7/99</span></div>
+    <div class="offset-cell is-onset"><span class="offset-t">0 s (onset)</span><span class="offset-val"><b>Astra</b> 7/99</span><span class="offset-val is-alt"><b>SFT-6k</b> 9/99</span></div>
+    <div class="offset-cell"><span class="offset-t">+1.0 s</span><span class="offset-val"><b>Astra</b> 6/99</span><span class="offset-val is-alt"><b>SFT-6k</b> 9/99</span></div>
+    <div class="offset-cell"><span class="offset-t">+3.0 s</span><span class="offset-val"><b>Astra</b> 6/99</span><span class="offset-val is-alt"><b>SFT-6k</b> 5/99</span></div>
+  </div>
+</div>
+</div></article>
+<article class="qa"><span class="qa-number" aria-hidden="true">04</span><h3>When does local repair translate into final task completion?</h3><div><p class="qa-takeaway">Finding: Local stage repair and positive self-verification do not guarantee net online rescue.</p><p>Resuming the source policy after <strong>388</strong> stage-success endpoints completes only <strong>195/388</strong> tasks, leaving <strong>193 (49.7%)</strong> incomplete. Online, false interventions can also harm baseline successes (<strong>BGR</strong> ΔSR <strong>−4.07</strong>; <strong>CycleVLA</strong> <strong>−13.89</strong>), while <strong>FastWAM/Astra</strong> records <strong>ΔSR = +0.00</strong>.</p>
+<div class="qa-visual" aria-label="Post-repair continuation outcomes across 388 stage-success endpoints">
+  <div class="qa-vis-title">Local repair → final task outcome (388 stage-success endpoints)</div>
+  <div class="resumption-bars">
+    <div class="res-row"><span class="res-name">Astra</span><div class="res-bar"><span class="res-gate" style="width:22.18%" title="Native gate: 55">55</span><span class="res-cont" style="width:29.44%" title="Source completes: 73">73</span><span class="res-inc" style="width:48.39%" title="Incomplete: 120">120</span></div><span class="res-total">128/248</span></div>
+    <div class="res-row"><span class="res-name">Recovery-SFT</span><div class="res-bar"><span class="res-gate" style="width:35.82%" title="Native gate: 24">24</span><span class="res-cont" style="width:23.88%" title="Source completes: 16">16</span><span class="res-inc" style="width:40.30%" title="Incomplete: 27">27</span></div><span class="res-total">40/67</span></div>
+    <div class="res-row"><span class="res-name">AgentChord</span><div class="res-bar"><span class="res-gate" style="width:27.40%" title="Native gate: 20">20</span><span class="res-cont" style="width:9.59%" title="Source completes: 7">7</span><span class="res-inc" style="width:63.01%" title="Incomplete: 46">46</span></div><span class="res-total">27/73</span></div>
+  </div>
+  <ul class="rrw-cov-legend">
+    <li><i class="cov-swatch res-gate-swatch"></i>Native gate at handoff (99)</li>
+    <li><i class="cov-swatch res-cont-swatch"></i>Source completes (96)</li>
+    <li><i class="cov-swatch res-inc-swatch"></i>Incomplete after continuation (193)</li>
+  </ul>
+</div>
+</div></article>
 </div></section>
-<section class="citation" id="citation" aria-labelledby="citation-title"><div class="wrap"><h2 id="citation-title">Citation</h2><p>Citation details will be added with the paper release.</p></div></section>
+<section class="section real-robot" id="real-robot" aria-labelledby="real-robot-title"><div class="wrap">
+<div class="section-heading"><h2 id="real-robot-title">Real-robot evaluation</h2><p>Single-arm and dual-arm Franka experiments with π<sub>0.5</sub> verify simulation trends and highlight physical handoff and bimanual limits.</p></div>
+
+<div class="real-cases">
+  <article class="case-card">
+    <div class="case-head"><span class="case-badge is-success">Completed</span><h3>Single-arm · Plate and puff</h3></div>
+    <div class="case-media-slot" aria-label="Single-arm plate and puff rollout video placeholder"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span>Physical rollout clip pending</span></div>
+    <ol class="case-steps">
+      <li><b>0 s</b><span>Plate tilted</span></li>
+      <li><b>31 s</b><span>Regrasp</span></li>
+      <li><b>77 s</b><span>Handoff to π<sub>0.5</sub></span></li>
+      <li><b>93 s</b><span>Completed</span></li>
+    </ol>
+    <p class="case-desc">Astra regrasps and levels the plate, hands control back at 77 s, and π<sub>0.5</sub> finishes the task.</p>
+  </article>
+  <article class="case-card">
+    <div class="case-head"><span class="case-badge is-partial">Stage only</span><h3>Single-arm · Cup stacking</h3></div>
+    <div class="case-media-slot" aria-label="Single-arm cup stacking rollout video placeholder"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span>Physical rollout clip pending</span></div>
+    <ol class="case-steps">
+      <li><b>0 s</b><span>Cup toppled</span></li>
+      <li><b>200 s</b><span>Regrasp</span></li>
+      <li><b>528 s</b><span>Handoff to π<sub>0.5</sub></span></li>
+      <li><b>564 s</b><span>Incomplete</span></li>
+    </ol>
+    <p class="case-desc">Astra rights the toppled cup and returns control at 528 s, but π<sub>0.5</sub> fails to complete stacking after handoff.</p>
+  </article>
+  <article class="case-card">
+    <div class="case-head"><span class="case-badge is-fail">False success</span><h3>Dual-arm · Flower arrangement</h3></div>
+    <div class="case-media-slot" aria-label="Dual-arm flower arrangement rollout video placeholder"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span>Physical rollout clip pending</span></div>
+    <ol class="case-steps">
+      <li><b>22.1 s</b><span>Failure state</span></li>
+      <li><b>154.9 s</b><span>Re-align flower</span></li>
+      <li><b>236.7 s</b><span>Relation misread</span></li>
+      <li><b>255.2 s</b><span>False success</span></li>
+    </ol>
+    <p class="case-desc">Astra misreads the spatial relation between flower and vase and declares success without completing insertion.</p>
+  </article>
+  <article class="case-card">
+    <div class="case-head"><span class="case-badge is-fail">Coordination failure</span><h3>Dual-arm · Bottle into box</h3></div>
+    <div class="case-media-slot" aria-label="Dual-arm bottle handover rollout video placeholder"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span>Physical rollout clip pending</span></div>
+    <ol class="case-steps">
+      <li><b>11.0 s</b><span>Handover start</span></li>
+      <li><b>40.3 s</b><span>Left not released</span></li>
+      <li><b>44.8 s</b><span>Bottle slips</span></li>
+      <li><b>53.8 s</b><span>Bottle dropped</span></li>
+    </ol>
+    <p class="case-desc">After the right gripper secures the bottle, Astra fails to release the left gripper and drops the bottle.</p>
+  </article>
+</div>
+
+<div class="real-agreement">
+  <div class="agree-card">
+    <span class="agree-tag">Track 1 · Sim-to-Real Agreement (Exploratory dev. eval.)</span>
+    <div class="agree-metrics">
+      <div><strong>ρ = 0.818</strong><span>Spearman vs. π<sub>0.5</sub>-family sim (253 rollouts)</span></div>
+      <div><strong>ρ = 0.755</strong><span>Spearman vs. full clean sim (1,000 rollouts)</span></div>
+    </div>
+    <p>11 monitors across 79 Franka rollouts (48 single-arm, 31 dual-arm; τ = 10 s); Hide-and-Seek leads at 65.70% TWA<sub>Δ</sub>.</p>
+  </div>
+  <div class="agree-card">
+    <span class="agree-tag">Track 2 · Capability Profile Correlation</span>
+    <div class="agree-metrics">
+      <div><strong>r = 0.764 · ρ = 0.841</strong><span>Policy retry across 6 shared capability groups</span></div>
+      <div><strong>r = 0.672 · ρ = 0.429</strong><span>Astra across 6 shared capability groups</span></div>
+    </div>
+    <p>Local repair again outpaces completion: single-arm Astra reaches <strong>69.2%</strong> Stage SR vs. <strong>49.2%</strong> task completion, while dual-arm drops to <strong>22.5%</strong>.</p>
+  </div>
+</div>
+
+<div class="real-table-block">
+  <div class="comp-head"><h3>Physical Franka task outcomes (π<sub>0.5</sub>)</h3><span>Nominal source trials vs. recovery from tested failures</span></div>
+  <div class="table-wrap">
+    <table class="real-table">
+      <caption>Real-robot recovery and final task completion across single-arm and dual-arm Franka tasks</caption>
+      <thead>
+        <tr>
+          <th scope="col">Task</th>
+          <th scope="col">Source policy SR</th>
+          <th scope="col">Policy retry · Stage SR</th>
+          <th scope="col">Spotter (Astra) · Stage SR</th>
+          <th scope="col">Spotter (Astra) · Task completion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="method-group"><th colspan="5" scope="rowgroup">Single-arm Franka (4 tasks)</th></tr>
+        <tr><th scope="row">Pour juice into bottle</th><td>68.0% (34/50)</td><td>30.0% (3/10)</td><td>90.0% (9/10)</td><td>70.0% (7/10)</td></tr>
+        <tr><th scope="row">Press matching-color button</th><td>42.0% (21/50)</td><td>70.0% (7/10)</td><td>80.0% (8/10)</td><td>80.0% (8/10)</td></tr>
+        <tr><th scope="row">Stack red cup on blue cup</th><td>62.0% (31/50)</td><td>13.3% (2/15)</td><td>66.7% (10/15)</td><td>33.3% (5/15)</td></tr>
+        <tr><th scope="row">Move plate with puff to white region</th><td>30.0% (15/50)</td><td>0.0% (0/15)</td><td>40.0% (6/15)</td><td>13.3% (2/15)</td></tr>
+        <tr class="mean-row"><th scope="row">Single-arm task mean</th><td>50.5%</td><td>28.3%</td><td>69.2%</td><td>49.2%</td></tr>
+        <tr class="method-group"><th colspan="5" scope="rowgroup">Dual-arm Franka (4 tasks)</th></tr>
+        <tr><th scope="row">Handover bottle into box</th><td>12.0% (6/50)</td><td>20.0% (2/10)</td><td>0.0% (0/10)</td><td>0.0% (0/10)</td></tr>
+        <tr><th scope="row">Coordinated flower arrangement</th><td>18.0% (9/50)</td><td>30.0% (3/10)</td><td>10.0% (1/10)</td><td>10.0% (1/10)</td></tr>
+        <tr><th scope="row">Lift pot</th><td>12.0% (3/25)</td><td>0.0% (0/5)</td><td>80.0% (4/5)</td><td>80.0% (4/5)</td></tr>
+        <tr><th scope="row">Place tennis ball in hanging bag*</th><td>76.0% (19/25)</td><td>0.0% (0/5)</td><td>0.0% (0/5)</td><td>0.0% (0/5)</td></tr>
+        <tr class="mean-row"><th scope="row">Dual-arm task mean</th><td>29.5%</td><td>12.5%</td><td>22.5%</td><td>22.5%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="comp-footnote">* In the tennis-ball harness, rejected actions reused an old observation; the recorded outcome reflects this deployment limitation.</p>
+</div>
+</div></section>
+<section class="citation" id="citation" aria-labelledby="citation-title"><div class="wrap"><h2 id="citation-title">Citation</h2><p>BibTeX and dataset release links will be added upon publication.</p></div></section>
 </main>
 <footer class="footer wrap"><a class="wordmark" href="#top">REGAIN</a><span>Anonymous submission</span></footer>
 </body>
