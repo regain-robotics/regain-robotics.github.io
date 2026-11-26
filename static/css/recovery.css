@@ -95,6 +95,7 @@
 .rrw-point { fill: var(--rrw-series); stroke: var(--rrw-point-outline); stroke-width: 1.5; }
 .rrw-tick {
   fill: var(--rrw-tick);
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   paint-order: stroke fill;
@@ -138,7 +139,7 @@
 .rrw-values strong { color: var(--text); font-weight: 500; }
 .rrw-axis-count { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .rrw-value { white-space: nowrap; }
-.rrw-value b { color: var(--rrw-series); font-weight: 600; font-variant-numeric: tabular-nums; }
+.rrw-value b { font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace); color: var(--rrw-series); font-weight: 600; font-variant-numeric: tabular-nums; }
 .rrw-axis-note { text-align: center; color: var(--rrw-amber); font-size: 12px; margin: 2px 0; }
 .rrw-footer-note { display: flex; justify-content: center; text-align: center; gap: 6px 20px; flex-wrap: wrap; color: var(--muted); }
 .rrw-rollout-hint { color: var(--muted); }

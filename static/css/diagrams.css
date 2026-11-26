@@ -163,7 +163,14 @@
   display: block;
   width: 100%;
   height: auto;
-  font-family: "Plus Jakarta Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans, "IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif);
+}
+
+.proto-spine-step,
+.pipe-counter,
+.pipe-step-num,
+[data-t1-scan-readout] {
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
 }
 
 /* --- Data Generation: Open-Canvas Sticky 5-Stage Pipeline --- */
