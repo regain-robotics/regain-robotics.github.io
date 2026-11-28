@@ -1670,6 +1670,21 @@ html[data-edge-ready] {
   font-size:11px;
   color:var(--muted);
 }
+.case-media-slot.is-ready {
+  aspect-ratio:auto;
+  border:1px solid var(--line);
+  background:#070a12;
+  overflow:hidden;
+  padding:0;
+}
+.case-video {
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:360px;
+  object-fit:contain;
+  background:#070a12;
+}
 .case-steps {
   list-style:none;
   margin:0;

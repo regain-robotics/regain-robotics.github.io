@@ -10,12 +10,12 @@
 <link rel="stylesheet" href="static/css/site.css?v=20261128a">
 <link rel="stylesheet" href="static/css/leaderboard.css?v=20261119a">
 <link rel="stylesheet" href="static/css/light.css?v=20261128a">
-<link rel="stylesheet" href="static/css/recovery.css?v=20261126b">
+<link rel="stylesheet" href="static/css/recovery.css?v=20261128c">
 <link rel="stylesheet" href="static/css/diagrams.css?v=20261127b">
 <script src="static/js/scroll.js?v=20261119a" defer></script>
 <script src="static/js/leaderboard.js?v=20261119a" defer></script>
 <script src="static/js/navigation.js?v=20261119a" defer></script>
-<script src="static/js/recovery.js?v=20261127a" defer></script>
+<script src="static/js/recovery.js?v=20261128e" defer></script>
 <script src="static/js/animations.js?v=20261127b" defer></script>
 </head>
 <body>
@@ -647,34 +647,50 @@
         </ul>
       </div>
     </figure>
-    <aside class="rrw-demo-popover is-visible" id="rrw-rollout-preview" role="region" aria-label="Reorientation paired simulation rollouts">
-      <div class="rrw-demo-column rrw-original"><div class="rrw-popover-heading"><span>Original</span><span class="rrw-demo-cap" data-demo-cap>Reorientation</span></div>
-        <figure class="rrw-demo-case"><figcaption>ManiSkill</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="maniskill" data-trajectory="original">
-          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="ManiSkill original rollout" hidden></video>
-          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
-        </div></figure>
-        <figure class="rrw-demo-case"><figcaption>RoboTwin</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="robotwin" data-trajectory="original">
-          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="RoboTwin original rollout" hidden></video>
-          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
-        </div></figure>
-        <figure class="rrw-demo-case"><figcaption>RoboLab</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="robolab" data-trajectory="original">
-          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="RoboLab original rollout" hidden></video>
-          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
-        </div></figure>
+    <aside class="rrw-yviewer" id="rrw-rollout-preview" role="region" aria-label="Reorientation Y-shaped simulation rollout">
+      <div class="rrw-yhead">
+        <div class="rrw-ymeta">
+          <strong data-demo-cap>Reorientation</strong>
+          <span class="rrw-ytask" data-demo-task>PickCube · t* = 3.3 s</span>
+        </div>
+        <div class="rrw-platforms" role="group" aria-label="Simulation platform">
+          <button type="button" data-platform="maniskill" aria-pressed="true">ManiSkill</button>
+          <button type="button" data-platform="robotwin" aria-pressed="false">RoboTwin</button>
+          <button type="button" data-platform="robolab" aria-pressed="false">RoboLab</button>
+        </div>
       </div>
-      <div class="rrw-demo-column rrw-corrective"><div class="rrw-popover-heading"><span>Corrective</span><span class="rrw-demo-cap" data-demo-cap>Reorientation</span></div>
-        <figure class="rrw-demo-case"><figcaption>ManiSkill</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="maniskill" data-trajectory="corrective">
-          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="ManiSkill corrective rollout" hidden></video>
-          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
-        </div></figure>
-        <figure class="rrw-demo-case"><figcaption>RoboTwin</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="robotwin" data-trajectory="corrective">
-          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="RoboTwin corrective rollout" hidden></video>
-          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
-        </div></figure>
-        <figure class="rrw-demo-case"><figcaption>RoboLab</figcaption><div class="rrw-placeholder" data-demo-preview data-domain="robolab" data-trajectory="corrective">
-          <video class="rrw-demo-video" muted loop playsinline preload="none" aria-label="RoboLab corrective rollout" hidden></video>
-          <div class="rrw-demo-empty"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span data-demo-status>Demo footage pending</span></div>
-        </div></figure>
+
+      <figure class="rrw-ycard rrw-yprefix">
+        <figcaption><span class="rrw-ybadge is-prefix">0 → t*</span>Shared prefix</figcaption>
+        <div class="rrw-placeholder" data-y-slot="prefix">
+          <video class="rrw-demo-video" muted playsinline preload="metadata" aria-label="Shared prefix up to failure onset"></video>
+        </div>
+      </figure>
+
+      <div class="rrw-yfork" aria-hidden="true">
+        <svg class="rrw-yfork-svg" viewBox="0 0 400 44" preserveAspectRatio="none">
+          <path d="M 200 0 V 14" stroke="var(--rrw-neutral)" stroke-width="1.4" fill="none"/>
+          <path d="M 200 14 C 200 28, 100 18, 100 44" stroke="var(--rrw-coral)" stroke-width="1.5" fill="none"/>
+          <path d="M 200 14 C 200 28, 300 18, 300 44" stroke="var(--rrw-mint)" stroke-width="1.5" fill="none"/>
+          <circle cx="200" cy="14" r="6" fill="var(--bg)" stroke="var(--rrw-amber)" stroke-width="1.5"/>
+          <circle cx="200" cy="14" r="2.4" fill="var(--rrw-amber)"/>
+        </svg>
+        <span class="rrw-yfork-label">Fork at failure state <em>s</em>*</span>
+      </div>
+
+      <div class="rrw-ybranches">
+        <figure class="rrw-ycard is-orig">
+          <figcaption><span class="rrw-ybadge is-orig">×</span>Original continuation</figcaption>
+          <div class="rrw-placeholder" data-y-slot="original">
+            <video class="rrw-demo-video" muted playsinline preload="metadata" aria-label="Original continuation from failure state"></video>
+          </div>
+        </figure>
+        <figure class="rrw-ycard is-corr">
+          <figcaption><span class="rrw-ybadge is-corr">✓</span>Corrective recovery</figcaption>
+          <div class="rrw-placeholder" data-y-slot="corrective">
+            <video class="rrw-demo-video" muted playsinline preload="metadata" aria-label="Corrective recovery from failure state"></video>
+          </div>
+        </figure>
       </div>
     </aside>
   </div>
@@ -799,26 +815,48 @@
     <p class="case-desc">Astra rights the toppled cup and returns control at 528 s, but π<sub>0.5</sub> fails to complete stacking after handoff.</p>
   </article>
   <article class="case-card">
-    <div class="case-head"><span class="case-badge is-fail">False success</span><h3>Dual-arm · Flower arrangement</h3></div>
-    <div class="case-media-slot" aria-label="Dual-arm flower arrangement rollout video placeholder"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span>Physical rollout clip pending</span></div>
+    <div class="case-head"><span class="case-badge is-success">Completed</span><h3>Dual-arm · Flower arrangement</h3></div>
+    <div class="case-media-slot is-ready"><video class="case-video" controls muted loop playsinline preload="metadata" aria-label="Dual-arm flower arrangement rollout video"><source src="static/videos/real-robot/dual-flower-arrangement.mp4" type="video/mp4"></video></div>
     <ol class="case-steps">
-      <li><b>22.1 s</b><span>Failure state</span></li>
-      <li><b>154.9 s</b><span>Re-align flower</span></li>
-      <li><b>236.7 s</b><span>Relation misread</span></li>
-      <li><b>255.2 s</b><span>False success</span></li>
+      <li><b>Step 1</b><span>Approach vase</span></li>
+      <li><b>Step 2</b><span>Align flower</span></li>
+      <li><b>Step 3</b><span>Insert &amp; release</span></li>
+      <li><b>Outcome</b><span>Handoff to π<sub>0.5</sub> (1/10)</span></li>
     </ol>
-    <p class="case-desc">Astra misreads the spatial relation between flower and vase and declares success without completing insertion.</p>
+    <p class="case-desc">Astra aligns and inserts the flower into the larger vase, then hands control back to π<sub>0.5</sub> (the 1/10 successful dual-arm flower trial).</p>
   </article>
   <article class="case-card">
-    <div class="case-head"><span class="case-badge is-fail">Coordination failure</span><h3>Dual-arm · Bottle into box</h3></div>
-    <div class="case-media-slot" aria-label="Dual-arm bottle handover rollout video placeholder"><span class="rrw-demo-mark" aria-hidden="true">▷</span><span>Physical rollout clip pending</span></div>
+    <div class="case-head"><span class="case-badge is-fail">Incomplete</span><h3>Dual-arm · Bottle into box</h3></div>
+    <div class="case-media-slot is-ready"><video class="case-video" controls muted loop playsinline preload="metadata" aria-label="Dual-arm bottle handover rollout video"><source src="static/videos/real-robot/dual-bottle-box.mp4" type="video/mp4"></video></div>
     <ol class="case-steps">
-      <li><b>11.0 s</b><span>Handover start</span></li>
-      <li><b>40.3 s</b><span>Left not released</span></li>
-      <li><b>44.8 s</b><span>Bottle slips</span></li>
-      <li><b>53.8 s</b><span>Bottle dropped</span></li>
+      <li><b>Step 1</b><span>Attempt right grasp</span></li>
+      <li><b>Step 2</b><span>Align left gripper</span></li>
+      <li><b>Step 3</b><span>Missed regrasp</span></li>
+      <li><b>Outcome</b><span>Failed (0/10)</span></li>
     </ol>
-    <p class="case-desc">After the right gripper secures the bottle, Astra fails to release the left gripper and drops the bottle.</p>
+    <p class="case-desc">Astra attempts to secure and re-grasp the bottle between both grippers, but repeatedly misses the bottle above the table (0/10 real-robot completion).</p>
+  </article>
+  <article class="case-card">
+    <div class="case-head"><span class="case-badge is-success">Completed</span><h3>Dual-arm · Lift pot</h3></div>
+    <div class="case-media-slot is-ready"><video class="case-video" controls muted loop playsinline preload="metadata" aria-label="Dual-arm pot lifting rollout video"><source src="static/videos/real-robot/dual-lift-pot.mp4" type="video/mp4"></video></div>
+    <ol class="case-steps">
+      <li><b>Step 1</b><span>Grip left handle</span></li>
+      <li><b>Step 2</b><span>Secure right handle</span></li>
+      <li><b>Step 3</b><span>Two-arm lift</span></li>
+      <li><b>Outcome</b><span>Completed (4/5)</span></li>
+    </ol>
+    <p class="case-desc">Astra grips both pot handles sequentially and coordinates a level two-arm lift (80.0% real-robot completion).</p>
+  </article>
+  <article class="case-card">
+    <div class="case-head"><span class="case-badge is-fail">Incomplete</span><h3>Dual-arm · Tennis ball into bag</h3></div>
+    <div class="case-media-slot is-ready"><video class="case-video" controls muted loop playsinline preload="metadata" aria-label="Dual-arm tennis ball into hanging bag rollout video"><source src="static/videos/real-robot/dual-tennis-bag.mp4" type="video/mp4"></video></div>
+    <ol class="case-steps">
+      <li><b>Step 1</b><span>Open &amp; grasp ball</span></li>
+      <li><b>Step 2</b><span>Lift clear</span></li>
+      <li><b>Step 3</b><span>Approach bag</span></li>
+      <li><b>Outcome</b><span>Failed (0/5)</span></li>
+    </ol>
+    <p class="case-desc">Astra moves the tennis ball toward the suspended bag opening, but fails to complete insertion (0/5; harness reused stale observations after rejected actions).</p>
   </article>
 </div>
 

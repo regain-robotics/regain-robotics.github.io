@@ -33,79 +33,202 @@
     const isVisible = profile => profile.id === 'baseline' || visibleOverlays.has(profile.id);
     let selectedAxis = 0;
 
-    // Paired simulation clips across 7 capabilities x 3 platforms.
-    const demoSources = {};
-    ['maniskill', 'robotwin', 'robolab'].forEach(platform => {
-      for (let axis = 0; axis < axisNames.length; axis += 1) {
-        demoSources[`${axis}:${platform}:original`] = `static/videos/recovery/ax${axis}_${platform}_orig.mp4`;
-        demoSources[`${axis}:${platform}:corrective`] = `static/videos/recovery/ax${axis}_${platform}_corr.mp4`;
-      }
-    });
-    const popover = root.querySelector('#rrw-rollout-preview');
-    const demos = [...popover.querySelectorAll('[data-demo-preview]')].map(preview => ({
-      preview, video: preview.querySelector('video'),
-      empty: preview.querySelector('.rrw-demo-empty'), status: preview.querySelector('[data-demo-status]')
-    }));
-    const demoCapLabels = [...popover.querySelectorAll('[data-demo-cap]')];
-    const rolloutHint = root.querySelector('.rrw-rollout-hint');
-    popover.hidden = false;
-    popover.classList.add('is-visible');
-    demos.forEach(({video}) => { video.muted = true; });
+    // Exact failure_frame-sliced Y-branch rollouts (7 capabilities x 3 platforms).
+    const YBRANCH_META = {
+      '0:maniskill': { task: 'LiftPegUpright', tStar: 3.1 },
+      '0:robotwin':  { task: 'place shoe', tStar: 54.5 },
+      '0:robolab':   { task: 'ClampInRightBin', tStar: 15.3 },
+      '1:maniskill': { task: 'PegInsertionSide', tStar: 7.3 },
+      '1:robotwin':  { task: 'move pillbottle pad', tStar: 46.2 },
+      '1:robolab':   { task: 'FoodPacking1Cans', tStar: 15.9 },
+      '2:maniskill': { task: 'PokeCube', tStar: 1.7 },
+      '2:robotwin':  { task: 'place bread basket', tStar: 28.2 },
+      '2:robolab':   { task: 'BananaThenRubiksCube', tStar: 13.5 },
+      '3:maniskill': { task: 'PickCube', tStar: 3.5 },
+      '3:robotwin':  { task: 'place bread skillet', tStar: 47.3 },
+      '3:robolab':   { task: 'MustardInRightBin', tStar: 8.1 },
+      '4:maniskill': { task: 'StackPyramid', tStar: 9.5 },
+      '4:robotwin':  { task: 'place a2b left', tStar: 60.2 },
+      '4:robolab':   { task: 'ClampInRightBin', tStar: 6.7 },
+      '5:robotwin':  { task: 'open laptop', tStar: 14.3 },
+      '6:maniskill': { task: 'PushCube', tStar: 2.3 },
+      '6:robotwin':  { task: 'turn switch', tStar: 11.6 }
+    };
 
-    function syncPreviewPlayback() {
-      demos.forEach(({video}) => {
-        if (document.hidden || !video.hasAttribute('src')) {
-          video.pause();
-          return;
-        }
-        video.play().then(() => {
-          if (document.hidden) video.pause();
-        }).catch(() => {});
-      });
+    let selectedPlatform = 'maniskill';
+    const viewer = root.querySelector('#rrw-rollout-preview');
+    const platformButtons = [...viewer.querySelectorAll('[data-platform]')];
+    const demoCapLabel = viewer.querySelector('[data-demo-cap]');
+    const demoTaskLabel = viewer.querySelector('[data-demo-task]');
+    const rolloutHint = root.querySelector('.rrw-rollout-hint');
+    const slots = {
+      prefix: viewer.querySelector('[data-y-slot="prefix"] video'),
+      original: viewer.querySelector('[data-y-slot="original"] video'),
+      corrective: viewer.querySelector('[data-y-slot="corrective"] video')
+    };
+    const allVideos = Object.values(slots).filter(Boolean);
+    allVideos.forEach(video => { video.muted = true; video.loop = false; });
+
+    let yPhase = 'prefix';
+    let cycleToken = 0;
+    let restartTimer = 0;
+    let origDone = false;
+    let corrDone = false;
+
+    function clearTimers() {
+      clearTimeout(restartTimer);
+      restartTimer = 0;
     }
-    function updateDemoSource() {
-      demos.forEach(({preview, video, empty, status}) => {
-        const source = demoSources[`${selectedAxis}:${preview.dataset.domain}:${preview.dataset.trajectory}`] || '';
-        const previous = video.getAttribute('src') || '';
-        if (source !== previous) {
-          if (source) video.setAttribute('src', source);
-          else video.removeAttribute('src');
+
+    function setPhase(phase) {
+      yPhase = phase;
+      viewer.dataset.phase = phase;
+    }
+
+    function playPrefixPhase(token) {
+      if (token !== cycleToken || document.hidden) return;
+      clearTimers();
+      setPhase('prefix');
+      origDone = false;
+      corrDone = false;
+      if (slots.original) { slots.original.pause(); try { slots.original.currentTime = 0; } catch {} }
+      if (slots.corrective) { slots.corrective.pause(); try { slots.corrective.currentTime = 0; } catch {} }
+      if (slots.prefix) {
+        try { slots.prefix.currentTime = 0; } catch {}
+        slots.prefix.play().catch(() => {});
+      }
+    }
+
+    function playBranchesPhase(token) {
+      if (token !== cycleToken || document.hidden) return;
+      clearTimers();
+      setPhase('branches');
+      origDone = false;
+      corrDone = false;
+      if (slots.prefix) slots.prefix.pause();
+      if (slots.original) {
+        try { slots.original.currentTime = 0; } catch {}
+        slots.original.play().catch(() => {});
+      } else {
+        origDone = true;
+      }
+      if (slots.corrective) {
+        try { slots.corrective.currentTime = 0; } catch {}
+        slots.corrective.play().catch(() => {});
+      } else {
+        corrDone = true;
+      }
+    }
+
+    function maybeLoopCycle(token) {
+      if (token !== cycleToken || !origDone || !corrDone || document.hidden) return;
+      clearTimers();
+      restartTimer = setTimeout(() => playPrefixPhase(token), 900);
+    }
+
+    function syncPlayback() {
+      if (document.hidden) {
+        clearTimers();
+        allVideos.forEach(v => v.pause());
+        return;
+      }
+      if (yPhase === 'prefix') {
+        slots.prefix?.play().catch(() => {});
+      } else {
+        if (!origDone) slots.original?.play().catch(() => {});
+        if (!corrDone) slots.corrective?.play().catch(() => {});
+      }
+    }
+
+    function updateYBranch() {
+      cycleToken += 1;
+      const token = cycleToken;
+      clearTimers();
+      setPhase('prefix');
+      origDone = false;
+      corrDone = false;
+
+      const availablePlatforms = platformButtons
+        .map(btn => btn.dataset.platform)
+        .filter(p => Boolean(YBRANCH_META[`${selectedAxis}:${p}`]));
+      if (!availablePlatforms.includes(selectedPlatform) && availablePlatforms.length) {
+        selectedPlatform = availablePlatforms[0];
+      }
+
+      const key = `${selectedAxis}:${selectedPlatform}`;
+      const info = YBRANCH_META[key] || { task: '', tStar: 0 };
+      const capName = axisNames[selectedAxis];
+      if (demoCapLabel) demoCapLabel.textContent = capName;
+      if (demoTaskLabel) demoTaskLabel.textContent = `${info.task} · t* = ${info.tStar.toFixed(1)} s`;
+      viewer.setAttribute('aria-label', `${capName} ${selectedPlatform} Y-shaped simulation rollout`);
+      platformButtons.forEach(btn => {
+        const hasCase = availablePlatforms.includes(btn.dataset.platform);
+        btn.hidden = !hasCase;
+        btn.setAttribute('aria-pressed', String(hasCase && btn.dataset.platform === selectedPlatform));
+      });
+
+      const v = '2';
+      const urls = {
+        prefix: `static/videos/recovery/ax${selectedAxis}_${selectedPlatform}_prefix.mp4?v=${v}`,
+        original: `static/videos/recovery/ax${selectedAxis}_${selectedPlatform}_orig.mp4?v=${v}`,
+        corrective: `static/videos/recovery/ax${selectedAxis}_${selectedPlatform}_corr.mp4?v=${v}`
+      };
+      Object.entries(urls).forEach(([role, src]) => {
+        const video = slots[role];
+        if (!video) return;
+        video.pause();
+        if (video.getAttribute('src') !== src) {
+          video.setAttribute('src', src);
           video.load();
+        } else {
+          try { video.currentTime = 0; } catch {}
         }
-        const hasFrame = Boolean(source) && source === previous && video.readyState >= 2;
-        video.hidden = !hasFrame;
-        empty.hidden = hasFrame;
-        status.textContent = source ? 'Loading preview…' : 'Demo footage pending';
       });
+      if (slots.prefix && slots.prefix.readyState >= 2) {
+        playPrefixPhase(token);
+      }
     }
+
     function selectAxis(axisIndex) {
       selectedAxis = axisIndex;
       updateComparison();
-      const capName = axisNames[selectedAxis];
-      demoCapLabels.forEach(label => { label.textContent = capName; });
-      popover.setAttribute('aria-label', `${capName} paired simulation rollouts`);
-      updateDemoSource();
-      syncPreviewPlayback();
+      updateYBranch();
     }
-    demos.forEach(({video, empty, status}) => {
-      video.preload = 'metadata';
-      video.addEventListener('loadeddata', () => {
-        if (!video.hasAttribute('src')) return;
-        video.hidden = false;
-        empty.hidden = true;
-        if (!document.hidden) video.play().catch(() => {});
+
+    if (slots.prefix) {
+      slots.prefix.addEventListener('loadeddata', () => {
+        if (yPhase === 'prefix' && !document.hidden) {
+          playPrefixPhase(cycleToken);
+        }
       });
-      video.addEventListener('error', () => {
-        video.pause();
-        video.hidden = true;
-        empty.hidden = false;
-        status.textContent = 'Demo footage pending';
+      slots.prefix.addEventListener('ended', () => {
+        playBranchesPhase(cycleToken);
+      });
+    }
+    if (slots.original) {
+      slots.original.addEventListener('ended', () => {
+        origDone = true;
+        maybeLoopCycle(cycleToken);
+      });
+    }
+    if (slots.corrective) {
+      slots.corrective.addEventListener('ended', () => {
+        corrDone = true;
+        maybeLoopCycle(cycleToken);
+      });
+    }
+
+    platformButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedPlatform = btn.dataset.platform;
+        updateYBranch();
       });
     });
-    document.addEventListener('visibilitychange', syncPreviewPlayback);
+
+    document.addEventListener('visibilitychange', syncPlayback);
     addEventListener('resize', drawRadar);
     if (rolloutHint) {
-      rolloutHint.textContent = 'Select a capability axis to switch paired simulation rollouts';
+      rolloutHint.textContent = 'Select a capability axis or platform to inspect the Y-branch rollout';
     }
 
     function drawRadar() {
