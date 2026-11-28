@@ -493,8 +493,8 @@ html.has-reveal .rrw-cov-bar.is-revealed span {
   transform: scaleX(1);
 }
 
-/* Responsive fallback for <= 900px and reduced motion */
-@media (max-width: 900px) {
+/* Responsive fallback for <= 720px and reduced motion */
+@media (max-width: 720px) {
   .proto-sticky-track,
   .data-sticky-track {
     height: auto;

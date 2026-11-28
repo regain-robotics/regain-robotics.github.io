@@ -33,8 +33,14 @@
     const isVisible = profile => profile.id === 'baseline' || visibleOverlays.has(profile.id);
     let selectedAxis = 0;
 
-    // Add approved local clips here, keyed by "axisIndex:domain:original|corrective".
+    // Paired simulation clips across 7 capabilities x 3 platforms.
     const demoSources = {};
+    ['maniskill', 'robotwin', 'robolab'].forEach(platform => {
+      for (let axis = 0; axis < axisNames.length; axis += 1) {
+        demoSources[`${axis}:${platform}:original`] = `static/videos/recovery/ax${axis}_${platform}_orig.mp4`;
+        demoSources[`${axis}:${platform}:corrective`] = `static/videos/recovery/ax${axis}_${platform}_corr.mp4`;
+      }
+    });
     const popover = root.querySelector('#rrw-rollout-preview');
     const demos = [...popover.querySelectorAll('[data-demo-preview]')].map(preview => ({
       preview, video: preview.querySelector('video'),
@@ -82,10 +88,12 @@
       syncPreviewPlayback();
     }
     demos.forEach(({video, empty, status}) => {
+      video.preload = 'metadata';
       video.addEventListener('loadeddata', () => {
         if (!video.hasAttribute('src')) return;
         video.hidden = false;
         empty.hidden = true;
+        if (!document.hidden) video.play().catch(() => {});
       });
       video.addEventListener('error', () => {
         video.pause();

@@ -40,11 +40,23 @@
 [data-theme="light"] .hero-background {
   background: #dfe5ee;
 }
+[data-theme="light"] .hero-bg-video {
+  filter: saturate(.88) brightness(.96);
+}
 [data-theme="light"].has-morph .hero {
   background: transparent;
 }
 [data-theme="light"] .hero-shell:before {
-  background: linear-gradient(90deg, #f7f8fa00, #f7f8fa40 30%, #f7f8fae0 66%, #f7f8faf5);
+  background: radial-gradient(ellipse 88% 80% at 50% 46%, rgba(247, 248, 250, 0.74) 0%, rgba(247, 248, 250, 0.90) 72%, rgba(247, 248, 250, 0.96) 100%);
+}
+[data-theme="light"] .hero-eyebrow {
+  color: var(--accent);
+}
+[data-theme="light"] .teaser-tag.is-orig i {
+  color: #c9403e;
+}
+[data-theme="light"] .teaser-tag.is-corr i {
+  color: #087f77;
 }
 [data-theme="light"] .background-label {
   color: #596779;
@@ -176,7 +188,7 @@
 }
 @media (max-width: 600px) {
   [data-theme="light"] .hero-shell:before {
-    background: linear-gradient(180deg, #f7f8fa00, #f7f8fa90 23%, #f7f8faf0 43%, #f7f8faff);
+    background: radial-gradient(ellipse 95% 88% at 50% 46%, rgba(247, 248, 250, 0.78) 0%, rgba(247, 248, 250, 0.93) 72%, rgba(247, 248, 250, 0.98) 100%);
   }
   [data-theme="light"] .branch {
     border-left-color: #8a94a6;

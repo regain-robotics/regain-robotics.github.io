@@ -1,41 +1,48 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="REGAIN benchmarks streaming failure detection, state-conditioned stage recovery, and online task rescue across 12,000 Y-shaped records and real Franka robots.">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#101114">
+<meta name="theme-color" content="#f7f8fa">
 <title>REGAIN: Benchmarking Failure Handling in Robot Foundation Models</title>
-<script src="static/js/theme.js?v=20261119a"></script>
-<link rel="stylesheet" href="static/css/site.css?v=20261126b">
+<link rel="stylesheet" href="static/css/site.css?v=20261128a">
 <link rel="stylesheet" href="static/css/leaderboard.css?v=20261119a">
-<link rel="stylesheet" href="static/css/light.css?v=20261124a">
+<link rel="stylesheet" href="static/css/light.css?v=20261128a">
 <link rel="stylesheet" href="static/css/recovery.css?v=20261126b">
-<link rel="stylesheet" href="static/css/diagrams.css?v=20261126b">
+<link rel="stylesheet" href="static/css/diagrams.css?v=20261127b">
 <script src="static/js/scroll.js?v=20261119a" defer></script>
 <script src="static/js/leaderboard.js?v=20261119a" defer></script>
 <script src="static/js/navigation.js?v=20261119a" defer></script>
-<script src="static/js/recovery.js?v=20261125e" defer></script>
-<script src="static/js/animations.js?v=20261125d" defer></script>
+<script src="static/js/recovery.js?v=20261127a" defer></script>
+<script src="static/js/animations.js?v=20261127b" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="topbar wrap"><a class="wordmark" href="#top" aria-label="REGAIN home">REGAIN</a><nav aria-label="Page sections"><span class="nav-indicator" aria-hidden="true"></span><a href="#overview">Overview</a><a href="#data">Data</a><a href="#recovery">Recovery</a><a href="#leaderboard">Leaderboard</a><a href="#research">Research</a><a href="#real-robot">Real robot</a></nav><button class="theme-toggle" type="button" aria-label="Switch to light theme" aria-pressed="false" title="Switch to light theme">
-<svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg>
-<svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/></svg>
-</button></header>
+<header class="topbar wrap"><a class="wordmark" href="#top" aria-label="REGAIN home">REGAIN</a><nav aria-label="Page sections"><span class="nav-indicator" aria-hidden="true"></span><a href="#overview">Overview</a><a href="#data">Data</a><a href="#recovery">Recovery</a><a href="#leaderboard">Leaderboard</a><a href="#research">Research</a><a href="#real-robot">Real robot</a></nav></header>
 
 <main id="main">
-<header class="hero" id="top"><button class="theme-toggle hero-theme-toggle" type="button" aria-label="Switch to light theme" aria-pressed="false" title="Switch to light theme">
-<svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg>
-<svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/></svg>
-</button><div class="hero-shell"><div class="hero-background" role="img" aria-label="Background video placeholder"><div class="background-label"><span class="background-frame" aria-hidden="true"></span><span>Background video</span><span class="background-note">Placeholder</span></div></div></div><div class="hero-copy">
+<header class="hero" id="top"><div class="hero-shell"><div class="hero-background"><video class="hero-bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true"><source src="static/videos/hero-bg.mp4" type="video/mp4"></video></div></div><div class="hero-copy">
+<p class="hero-eyebrow">Failure detection · Stage recovery · Online rescue</p>
 <h1>REGAIN</h1>
 <p class="hero-title"><span>Benchmarking Failure Handling</span><span>in Robot Foundation Models</span></p>
-<div class="hero-bottom"><nav class="links" aria-label="Project resources"><a class="button primary" href="#teaser">Video <span aria-hidden="true">↗</span></a><a class="button" href="#leaderboard">Leaderboard <span aria-hidden="true">↓</span></a><span class="button button-muted" aria-disabled="true">Paper · Code · Dataset · Coming soon</span></nav><p class="brief">REGAIN connects streaming failure detection, state-conditioned stage recovery, and online task rescue across 12,000 Y-shaped records, three simulation platforms, eight source RFMs, and physical Franka evaluations.</p></div>
+<div class="hero-bottom"><p class="brief">REGAIN connects streaming failure detection, state-conditioned stage recovery, and online task rescue across 12,000 Y-shaped records, three simulation platforms, eight source RFMs, and physical Franka evaluations.</p><nav class="links" aria-label="Project resources"><a class="button primary" href="#teaser">Video <span aria-hidden="true">↗</span></a><a class="button" href="#leaderboard">Leaderboard <span aria-hidden="true">↓</span></a><span class="button button-muted" aria-disabled="true">Paper · Code · Dataset · Coming soon</span></nav></div>
 </div></header>
-<section class="teaser wrap" id="teaser" aria-labelledby="teaser-title"><div class="video-slot"><div class="play-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m7 4 13 8-13 8Z"/></svg></div><div><h2 id="teaser-title">Teaser</h2><p>Demo video placeholder</p></div></div></section>
+<section class="teaser wrap" id="teaser" aria-labelledby="teaser-title">
+  <h2 id="teaser-title" class="sr-only">Teaser</h2>
+  <div class="teaser-frame">
+    <div class="teaser-rail" aria-hidden="true">
+      <span class="teaser-tag is-orig"><i>×</i> Original continuation</span>
+      <span class="teaser-tag is-corr"><i>✓</i> Corrective recovery</span>
+    </div>
+    <div class="video-slot is-ready"><video class="teaser-video" controls muted loop playsinline preload="metadata" poster="static/videos/teaser-poster.jpg" aria-label="REGAIN teaser highlight video"><source src="static/videos/teaser.mp4" type="video/mp4"></video></div>
+    <div class="teaser-caption">
+      <span>Y-shaped failure–recovery rollouts</span>
+      <span class="teaser-chapters">00–08 s Real Franka · 08–14 s ManiSkill · 14–20 s RoboTwin</span>
+    </div>
+  </div>
+</section>
 <section class="section" id="overview" aria-labelledby="overview-title"><div class="wrap">
 <div class="section-heading"><h2 id="overview-title">Overview</h2><p>Three tracks connect recognition, corrective capability, and the impact of online intervention.</p></div>
 <div class="concern"><h3 class="small-heading">Our key concern</h3><p>Can a robot recognize a failure on time, repair the affected task stage, and complete the original task?</p></div>

@@ -149,7 +149,7 @@
     const drawFns = [drawAct1, drawAct2, drawAct3];
 
     renderProtocol = () => {
-      const fallback = innerWidth <= 900 || reducedMotion.matches;
+      const fallback = innerWidth <= 720 || reducedMotion.matches;
       if (fallback) {
         actPairs.forEach((pair, i) => {
           pair.style.opacity = '';
@@ -264,7 +264,7 @@
     }
 
     renderPipeline = () => {
-      if (innerWidth <= 900 || reducedMotion.matches) {
+      if (innerWidth <= 720 || reducedMotion.matches) {
         drawPipelineAt(1);
         return;
       }
